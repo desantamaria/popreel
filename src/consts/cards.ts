@@ -21,7 +21,7 @@ export const CARDS = [
   },
 ];
 
-export const DASHBOARD_CARDS = [
+export const FEED_CARDS = [
   {
     title: "Authenticate requests with JWT's",
     description:
