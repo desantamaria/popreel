@@ -28,7 +28,6 @@ export default async function FeedPage() {
                   }}
                 />
                 <UserButton
-                  afterSignOutUrl="/"
                   appearance={{
                     elements: {
                       userButtonAvatarBox: "size-6",
