@@ -1,4 +1,4 @@
-import { InferSelectModel } from "drizzle-orm";
+import { InferSelectModel, relations } from "drizzle-orm";
 import {
   bigint,
   index,
@@ -12,6 +12,7 @@ import {
   vector,
 } from "drizzle-orm/pg-core";
 
+// Tables
 export const users = pgTable("users", {
   id: uuid("id").defaultRandom().primaryKey(),
   clerkId: text("clerk_id").notNull().unique(),
@@ -112,6 +113,73 @@ export const bookmarks = pgTable("bookmarks", {
   updatedAt: timestamp("updated_at"),
 });
 
+// Relations
+export const usersRelations = relations(users, ({ many }) => ({
+  videos: many(videos),
+  views: many(views),
+  likes: many(likes),
+  comments: many(comments),
+  shares: many(shares),
+  bookmarks: many(bookmarks),
+}));
+
+export const videosRelations = relations(videos, ({ one, many }) => ({
+  users: one(users, {
+    fields: [videos.userId],
+    references: [users.clerkId],
+  }),
+  views: many(views),
+  likes: many(likes),
+  comments: many(comments),
+  shares: many(shares),
+  bookmarks: many(bookmarks),
+}));
+
+export const likesRelations = relations(likes, ({ one }) => ({
+  users: one(users, {
+    fields: [likes.userId],
+    references: [users.clerkId],
+  }),
+  videos: one(videos, {
+    fields: [likes.videoId],
+    references: [videos.id],
+  }),
+}));
+
+export const commentsRelations = relations(views, ({ one }) => ({
+  users: one(users, {
+    fields: [views.userId],
+    references: [users.clerkId],
+  }),
+  videos: one(videos, {
+    fields: [views.videoId],
+    references: [videos.id],
+  }),
+}));
+
+export const sharesRelations = relations(shares, ({ one }) => ({
+  users: one(users, {
+    fields: [shares.userId],
+    references: [users.clerkId],
+  }),
+  videos: one(videos, {
+    fields: [shares.videoId],
+    references: [videos.id],
+  }),
+}));
+
+export const bookmarksRelations = relations(bookmarks, ({ one }) => ({
+  users: one(users, {
+    fields: [bookmarks.userId],
+    references: [users.clerkId],
+  }),
+  videos: one(videos, {
+    fields: [bookmarks.videoId],
+    references: [videos.id],
+  }),
+}));
+
+// Types
 export type User = InferSelectModel<typeof users>;
 export type Video = InferSelectModel<typeof videos>;
 export type View = InferSelectModel<typeof views>;
