@@ -1,4 +1,4 @@
-import { InferSelectModel, relations } from "drizzle-orm";
+import { InferInsertModel, InferSelectModel, relations } from "drizzle-orm";
 import {
   bigint,
   index,
@@ -180,10 +180,18 @@ export const bookmarksRelations = relations(bookmarks, ({ one }) => ({
 }));
 
 // Types
-export type User = InferSelectModel<typeof users>;
-export type Video = InferSelectModel<typeof videos>;
-export type View = InferSelectModel<typeof views>;
-export type Like = InferSelectModel<typeof likes>;
-export type Comment = InferSelectModel<typeof comments>;
-export type Share = InferSelectModel<typeof shares>;
-export type Bookmark = InferSelectModel<typeof bookmarks>;
+export type UserAggregation = InferSelectModel<typeof users>;
+export type VideoAggregation = InferSelectModel<typeof videos>;
+export type ViewAggregation = InferSelectModel<typeof views>;
+export type LikeAggregation = InferSelectModel<typeof likes>;
+export type CommentAggregation = InferSelectModel<typeof comments>;
+export type ShareAggregation = InferSelectModel<typeof shares>;
+export type BookmarkAggregation = InferSelectModel<typeof bookmarks>;
+
+export type CreateUserInput = InferInsertModel<typeof users>;
+export type CreateVideoInput = InferInsertModel<typeof videos>;
+export type CreateViewInput = InferInsertModel<typeof views>;
+export type CreateLikeInput = InferInsertModel<typeof likes>;
+export type CreateCommentInput = InferInsertModel<typeof comments>;
+export type CreateShareInput = InferInsertModel<typeof shares>;
+export type CreateBookmarkInput = InferInsertModel<typeof bookmarks>;
