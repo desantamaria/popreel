@@ -1,12 +1,20 @@
 import { Button } from "@/components/ui/button";
-import { Compass, Home, MessageCircle, Plus, Radio, User } from "lucide-react";
+import { Home, MessageCircle, Plus } from "lucide-react";
 import Link from "next/link";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "./ui/dropdown-menu";
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+import { SignOutButton } from "@clerk/nextjs";
 
 export function FeedSidebar() {
   return (
-    <div className="w-[60px] lg:w-[180px] h-screen flex-shrink-0 border-r border-gray-800">
+    <div className="w-[60px] lg:w-[180px] h-screen flex flex-col justify-between border-r border-gray-800 pt-10">
       <div className="space-y-2 px-2">
-        <Link href="/">
+        <Link href="/feed">
           <Button
             variant="ghost"
             size="lg"
@@ -16,7 +24,7 @@ export function FeedSidebar() {
             <span className="hidden lg:inline">For You</span>
           </Button>
         </Link>
-        <Link href="/explore">
+        {/* <Link href="/explore">
           <Button
             variant="ghost"
             size="lg"
@@ -25,7 +33,7 @@ export function FeedSidebar() {
             <Compass className="h-5 w-5" />
             <span className="hidden lg:inline">Explore</span>
           </Button>
-        </Link>
+        </Link> */}
         <Link href="/following">
           <Button
             variant="ghost"
@@ -36,16 +44,7 @@ export function FeedSidebar() {
             <span className="hidden lg:inline">Following</span>
           </Button>
         </Link>
-        <Link href="/live">
-          <Button
-            variant="ghost"
-            size="lg"
-            className="w-full justify-start gap-2"
-          >
-            <Radio className="h-5 w-5" />
-            <span className="hidden lg:inline">LIVE</span>
-          </Button>
-        </Link>
+
         <Link href="/upload">
           <Button
             variant="ghost"
@@ -56,7 +55,7 @@ export function FeedSidebar() {
             <span className="hidden lg:inline">Upload</span>
           </Button>
         </Link>
-        <Link href="/profile">
+        {/* <Link href="/profile">
           <Button
             variant="ghost"
             size="lg"
@@ -65,7 +64,22 @@ export function FeedSidebar() {
             <User className="h-5 w-5" />
             <span className="hidden lg:inline">Profile</span>
           </Button>
-        </Link>
+        </Link> */}
+      </div>
+      <div className="flex justify-end px-7 py-7">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild className="hover:cursor-pointer">
+            <Avatar>
+              <AvatarImage></AvatarImage>
+              <AvatarFallback>CN</AvatarFallback>
+            </Avatar>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent>
+            <DropdownMenuItem asChild className="w-full">
+              <SignOutButton />
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
     </div>
   );

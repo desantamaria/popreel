@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 const isOnboardingRoute = createRouteMatcher(["/onboarding"]);
 const isPublicRoute = createRouteMatcher(["/public"]);
-const isProtectedRoute = createRouteMatcher(["/feed(.*)"]);
+const isProtectedRoute = createRouteMatcher(["/feed(.*)", "/upload(.*)"]);
 
 export default clerkMiddleware(async (auth, req: NextRequest) => {
   const { userId, sessionClaims } = await auth();

@@ -1,7 +1,7 @@
 import { FeedSidebar } from "@/components/feed-sidebar";
 import { VideoFeed } from "@/components/video-feed";
 
-export default function Page() {
+export default function FeedPage() {
   return (
     <div className="flex h-screen bg-black text-white">
       <FeedSidebar />
