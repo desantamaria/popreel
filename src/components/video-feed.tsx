@@ -64,17 +64,19 @@ export function VideoFeed() {
   }, [currentVideoIndex]);
 
   return (
-    <div className="h-screen overflow-hidden" onWheel={handleScroll}>
+    <div
+      className="h-screen overflow-hidden snap-y snap-mandatory"
+      onWheel={handleScroll}
+    >
       <div
         ref={containerRef}
         className="transition-transform duration-500 ease-in-out"
+        style={{ height: `${videos.length * 100}vh` }}
       >
         {videos.map((video, index) => (
-          <VideoPost
-            key={video.id}
-            {...video}
-            isActive={index === currentVideoIndex}
-          />
+          <div key={video.id} className="snap-start h-screen">
+            <VideoPost {...video} isActive={index === currentVideoIndex} />
+          </div>
         ))}
       </div>
     </div>

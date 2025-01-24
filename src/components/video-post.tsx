@@ -39,12 +39,42 @@ export function VideoPost({
     }
   }, [isActive]);
 
+  useEffect(() => {
+    const handleResize = () => {
+      if (videoRef.current) {
+        const video = videoRef.current;
+        const aspectRatio = video.videoWidth / video.videoHeight;
+        const windowRatio = window.innerWidth / window.innerHeight;
+
+        if (aspectRatio > windowRatio) {
+          video.style.width = "100%";
+          video.style.height = "auto";
+        } else {
+          video.style.width = "auto";
+          video.style.height = "100%";
+        }
+      }
+    };
+
+    window.addEventListener("resize", handleResize);
+    if (videoRef.current) {
+      videoRef.current.addEventListener("loadedmetadata", handleResize);
+    }
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+      if (videoRef.current) {
+        videoRef.current.removeEventListener("loadedmetadata", handleResize);
+      }
+    };
+  }, []);
+
   return (
-    <div className="relative h-screen w-full flex-shrink-0 bg-black overflow-hidden">
+    <div className="relative h-screen w-full flex-shrink-0 bg-black overflow-hidden flex items-center justify-center">
       <video
         ref={videoRef}
         src={url}
-        className="absolute inset-0 w-full h-full object-cover"
+        className="absolute inset-0 w-full h-full object-contain"
         loop
         muted
         playsInline
