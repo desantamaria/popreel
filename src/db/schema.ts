@@ -19,6 +19,7 @@ export const users = pgTable("users", {
   username: varchar("username").notNull().unique(),
   avatarUrl: text("avatar_url"),
   bio: text("bio"),
+  metadata: jsonb("metadata"),
   createdAt: timestamp("created_at"),
   updatedAt: timestamp("updated_at"),
 });
