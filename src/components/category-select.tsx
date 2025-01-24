@@ -1,12 +1,10 @@
 "use client";
 
 import { completeOnboarding } from "@/app/onboarding/_actions";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { categories } from "@/lib/categories";
 import { useUser } from "@clerk/nextjs";
-import { AlertCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
