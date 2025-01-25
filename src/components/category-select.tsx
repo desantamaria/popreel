@@ -1,101 +1,51 @@
 "use client";
 
-import { completeOnboarding } from "@/app/onboarding/_actions";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { categories } from "@/lib/categories";
-import { useUser } from "@clerk/nextjs";
-import { useRouter } from "next/navigation";
+import { categoriesList } from "@/lib/categories";
+import { useVideoUploadStore } from "@/stores/video-upload-store";
 import { useState } from "react";
-import { toast } from "sonner";
-const MINIMUM_SELECTIONS = 3;
 
-export default function OnboardingForm() {
-  const [username, setUsername] = useState<string>("");
-  const [selectedInterests, setSelectedInterests] = useState<string[]>([]);
-
-  const { user } = useUser();
-  const router = useRouter();
-
-  const handleSubmit = async () => {
-    if (selectedInterests.length < MINIMUM_SELECTIONS && username.length < 2) {
-      return;
-    }
-
-    const res = await completeOnboarding({ username, selectedInterests });
-    if (res?.message) {
-      await user?.reload();
-      router.push("/feed");
-    }
-    if (res?.error) {
-      toast(`An unexpected error occurred: ${res?.error}`);
-    }
-  };
+export default function CategorySelect() {
+  const { categories, setCategories } = useVideoUploadStore();
 
   const toggleInterest = (label: string) => {
-    setSelectedInterests((prev) => {
-      if (prev.includes(label)) {
-        return prev.filter((item) => item !== label);
-      }
-      return [...prev, label];
-    });
+    let prev = categories as string[];
+    if (prev.includes(label)) {
+      setCategories(prev.filter((item) => item !== label));
+    } else {
+      setCategories([...prev, label]);
+    }
   };
-
   return (
-    <div className="min-h-screen bg-background p-6 md:p-12">
-      <Card className="mx-auto max-w-5xl">
-        <CardContent className="p-6 md:p-12">
-          <div className="flex items-center justify-between mb-8">
-            <div>
-              <h1 className="text-4xl font-bold mb-2">Choose your interests</h1>
-              <p className="text-muted-foreground text-lg">
-                Get personalized video recommendations
-              </p>
-              <p className="text-sm text-muted-foreground mt-2">
-                Select at least {MINIMUM_SELECTIONS} interests to continue
-              </p>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {categories.map((categories) => {
-              const isSelected = selectedInterests.includes(categories.label);
-              return (
-                <Button
-                  key={categories.label}
-                  variant={isSelected ? "default" : "outline"}
-                  className={`h-auto py-6 px-4 flex items-center justify-center gap-2 transition-all ${
-                    isSelected
-                      ? "bg-primary text-primary-foreground"
-                      : "hover:bg-accent hover:text-accent-foreground"
-                  }`}
-                  onClick={() => toggleInterest(categories.label)}
-                >
-                  <span className="text-2xl">{categories.emoji}</span>
-                  <span className="text-base font-medium">
-                    {categories.label}
-                  </span>
-                </Button>
-              );
-            })}
-          </div>
-
-          <div className="mt-8 flex flex-col items-center gap-4">
-            <p className="text-sm text-muted-foreground">
-              {selectedInterests.length} of {MINIMUM_SELECTIONS} minimum
-              selections
-            </p>
+    <div className="mx-auto">
+      <div className="flex items-center justify-between mb-8">
+        <div>
+          <h1 className="text-4xl font-bold mb-2">Choose Categories</h1>
+          <p className="text-sm text-muted-foreground mt-2">
+            Select at least 1 category
+          </p>
+        </div>
+      </div>
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+        {categoriesList.map((category) => {
+          const isSelected = categories.includes(category.label);
+          return (
             <Button
-              size="lg"
-              className="px-12"
-              onClick={handleSubmit}
-              disabled={selectedInterests.length < MINIMUM_SELECTIONS}
+              key={category.label}
+              variant={isSelected ? "default" : "outline"}
+              className={`h-auto py-3 px-1 flex items-center justify-center gap-2 transition-all ${
+                isSelected
+                  ? "bg-primary text-primary-foreground"
+                  : "hover:bg-accent hover:text-accent-foreground"
+              }`}
+              onClick={() => toggleInterest(category.label)}
             >
-              Next
+              <span className="text-sm">{category.emoji}</span>
+              <span className="text-base font-medium">{category.label}</span>
             </Button>
-          </div>
-        </CardContent>
-      </Card>
+          );
+        })}
+      </div>
     </div>
   );
 }

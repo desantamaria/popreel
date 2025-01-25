@@ -3,7 +3,7 @@ interface Category {
   label: string;
 }
 
-export const categories: Category[] = [
+export const categoriesList: Category[] = [
   { emoji: "🐱", label: "Animals" },
   { emoji: "🤣", label: "Comedy" },
   { emoji: "🏖️", label: "Travel" },
@@ -20,5 +20,4 @@ export const categories: Category[] = [
   { emoji: "💡", label: "Life Hacks" },
   { emoji: "🤤", label: "Oddly Satisfying" },
   { emoji: "🌲", label: "Outdoors" },
-  { emoji: "🦸‍♂️", label: "Fandom" },
 ];

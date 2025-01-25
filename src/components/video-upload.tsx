@@ -1,20 +1,20 @@
-"use client";
-
-import { useState, useCallback } from "react";
-import { useDropzone } from "react-dropzone";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { useVideoUploadStore } from "@/stores/video-upload-store";
+import type { VideoUploadProps } from "@/types/video";
 import {
-  Upload,
-  Video,
+  RatioIcon as AspectRatio,
   FileType,
   MonitorPlay,
-  RatioIcon as AspectRatio,
+  Upload,
+  Video,
 } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
-import type { VideoDetails, VideoUploadProps } from "@/types/video";
+import { useCallback, useState } from "react";
+import { useDropzone } from "react-dropzone";
+import CategorySelect from "./category-select";
 
 export default function VideoUpload({
   maxSize = 10,
@@ -22,17 +22,16 @@ export default function VideoUpload({
   acceptedFormats = [".mp4"],
   onUpload,
 }: VideoUploadProps) {
-  const [videoDetails, setVideoDetails] = useState<VideoDetails | null>(null);
+  const { filename, size, uploaded, setFilename, setSize, setUploaded } =
+    useVideoUploadStore();
 
   const onDrop = useCallback(
     (acceptedFiles: File[]) => {
       const file = acceptedFiles[0];
       if (file) {
-        setVideoDetails({
-          filename: file.name,
-          size: `${(file.size / (1024 * 1024)).toFixed(2)}MB`,
-          uploaded: true,
-        });
+        setFilename(file.name);
+        setSize(`${(file.size / (1024 * 1024)).toFixed(2)}MB`);
+        setUploaded(true);
         onUpload(file);
       }
     },
@@ -47,36 +46,40 @@ export default function VideoUpload({
     maxSize: maxSize * 1024 * 1024, // Convert MB to bytes
   });
 
-  if (videoDetails) {
+  if (filename && size && uploaded) {
     return (
-      <Card className="w-full max-w-4xl mx-auto">
+      <Card className="w-full max-w-4xl mx-auto p-4">
         <CardContent className="p-6">
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-4">
               <Video className="h-6 w-6" />
               <div>
-                <p className="font-medium">{videoDetails.filename}</p>
-                <p className="text-sm text-muted-foreground">
-                  {videoDetails.size}
-                </p>
+                <p className="font-medium">{filename}</p>
+                <p className="text-sm text-muted-foreground">{size}</p>
               </div>
             </div>
-            <Button variant="outline" onClick={() => setVideoDetails(null)}>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setFilename(null);
+                setSize(null);
+                setUploaded(false);
+              }}
+            >
               Replace
             </Button>
           </div>
 
           <div className="space-y-6">
             <div>
-              <Label htmlFor="description">Description</Label>
+              <Label htmlFor="caption">Caption</Label>
               <Textarea
-                id="description"
-                placeholder="Add a description..."
+                id="caption"
+                placeholder="Add a caption..."
                 className="mt-2"
                 rows={4}
               />
             </div>
-
             <div>
               <Label htmlFor="location">Location</Label>
               <Input
@@ -84,6 +87,12 @@ export default function VideoUpload({
                 placeholder="Add a location..."
                 className="mt-2"
               />
+            </div>
+            <div>
+              <CategorySelect />
+            </div>
+            <div>
+              <Button className="w-full">Submit</Button>
             </div>
           </div>
         </CardContent>

@@ -16,7 +16,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { categories } from "@/lib/categories";
+import { categoriesList } from "@/lib/categories";
 import { completeOnboarding } from "@/app/onboarding/_actions";
 
 const MINIMUM_SELECTIONS = 3;
@@ -94,7 +94,7 @@ export default function OnboardingCarousel() {
                     Select at least {MINIMUM_SELECTIONS} interests to continue
                   </p>
                   <div className="grid grid-cols-2 gap-2 mb-4">
-                    {categories.map((category) => {
+                    {categoriesList.map((category) => {
                       const isSelected = selectedInterests.includes(
                         category.label
                       );
