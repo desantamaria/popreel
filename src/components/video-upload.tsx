@@ -1,8 +1,10 @@
+import { handleVideoSubmit } from "@/actions/handleVideoSubmit";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { isAuthenticated } from "@/helpers/isAuthenticated";
 import { useVideoUploadStore } from "@/stores/video-upload-store";
 import type { VideoUploadProps } from "@/types/video";
 import { upload } from "@vercel/blob/client";
@@ -62,13 +64,17 @@ export default function VideoUpload({
       console.log("file not valid", file);
       return;
     }
+    setLoading(true);
 
+    // Upload to Vercel Blob
     const newBlob = await upload(file.name, file, {
       access: "public",
       handleUploadUrl: "/api/video/upload",
     });
 
-    console.log(newBlob);
+    console.log(newBlob.url);
+    handleVideoSubmit(newBlob.url, caption || "");
+    setLoading(false);
   }
 
   if (filename && size && uploaded) {
