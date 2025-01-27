@@ -1,15 +1,21 @@
 "use server";
 
 import { createVideo } from "@/db/operations";
-import { CreateVideoInput } from "@/db/schema";
+import { CreateVideoInput, VideoMetadata } from "@/db/schema";
 import { isAuthenticated } from "@/helpers/isAuthenticated";
+import { CreateEmbeddingResponse } from "openai/resources";
 
-export async function handleVideoSubmit(url: string, caption: string) {
+export async function AddVideoToNeon(
+  url: string,
+  metadata: VideoMetadata,
+  embedding: CreateEmbeddingResponse
+) {
   const userId = await isAuthenticated();
   const newVideo = {
     videoUrl: url,
     userId: userId,
-    caption: caption,
+    metadata: metadata,
+    embedding: embedding,
     viewsCount: 0,
     likesCount: 0,
     commentsCount: 0,

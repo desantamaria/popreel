@@ -4,10 +4,13 @@ import { migrate } from "drizzle-orm/neon-http/migrator";
 import { neon } from "@neondatabase/serverless";
 import { sql } from "drizzle-orm";
 import { env } from "@/config/env";
+import { Logger } from "@/utils/logger";
+
+const logger = new Logger("DB:Operations");
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function dropAllTables(db: any) {
-  console.log("Dropping all existing tables...");
+  logger.info("Dropping all existing tables...");
 
   const tables = ["users, videos, views, likes, comments, shares, bookmarks"];
 
@@ -16,13 +19,13 @@ async function dropAllTables(db: any) {
       await db.execute(
         sql`DROP TABLE IF EXISTS ${sql.identifier(table)} CASCADE;`
       );
-      console.log(`Dropped table ${table}`);
+      logger.info(`Dropped table ${table}`);
     } catch (error) {
-      console.error(`Failed to drop table ${table}:`, error);
+      logger.error(`Failed to drop table ${table}:`, error);
     }
   }
 
-  console.log("All tables dropped successfully");
+  logger.info("All tables dropped successfully");
 }
 
 async function runMigrations() {
@@ -36,13 +39,13 @@ async function runMigrations() {
       await dropAllTables(db);
     }
 
-    console.log("Running migrations...");
+    logger.info("Running migrations...");
     await migrate(db, {
       migrationsFolder: "src/db/migrations",
     });
-    console.log("Migrations completed successfully");
+    logger.info("Migrations completed successfully");
   } catch (error) {
-    console.error("Operation failed:", error);
+    logger.error("Operation failed:", error);
     process.exit(1);
   }
 }

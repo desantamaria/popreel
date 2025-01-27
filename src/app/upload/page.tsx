@@ -13,9 +13,6 @@ export default function UploadPage() {
             maxSize={10}
             maxDuration={60}
             acceptedFormats={[".mp4", ".mov", ".avi"]}
-            onUpload={(file) => {
-              console.log("Uploaded file:", file);
-            }}
           />
         </div>
       </main>

@@ -1,10 +1,9 @@
-import { handleVideoSubmit } from "@/actions/handleVideoSubmit";
+import { AddVideoToNeon } from "@/actions/addVideoToNeon";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { isAuthenticated } from "@/helpers/isAuthenticated";
 import { useVideoUploadStore } from "@/stores/video-upload-store";
 import type { VideoUploadProps } from "@/types/video";
 import { upload } from "@vercel/blob/client";
@@ -17,6 +16,7 @@ import {
 } from "lucide-react";
 import { useDropzone } from "react-dropzone";
 import CategorySelect from "./category-select";
+import { getOpenAIEmbeddings } from "@/lib/getEmbeddings";
 
 export default function VideoUpload({
   maxSize = 10,
@@ -31,6 +31,7 @@ export default function VideoUpload({
     caption,
     location,
     file,
+    categories,
     setLoading,
     setFilename,
     setSize,
@@ -61,7 +62,6 @@ export default function VideoUpload({
 
   async function handleSubmit() {
     if (!file) {
-      console.log("file not valid", file);
       return;
     }
     setLoading(true);
@@ -72,8 +72,18 @@ export default function VideoUpload({
       handleUploadUrl: "/api/video/upload",
     });
 
-    console.log(newBlob.url);
-    handleVideoSubmit(newBlob.url, caption || "");
+    const inputMetadata = {
+      categories: categories,
+      location: location,
+      caption: caption,
+    };
+
+    const embedding = await getOpenAIEmbeddings(JSON.stringify(inputMetadata));
+
+    console.log(embedding);
+
+    // Add Video Entry to DB
+    AddVideoToNeon(newBlob.url, inputMetadata, embedding);
     setLoading(false);
   }
 

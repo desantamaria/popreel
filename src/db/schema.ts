@@ -11,6 +11,14 @@ import {
   varchar,
   vector,
 } from "drizzle-orm/pg-core";
+import { CreateEmbeddingResponse } from "openai/resources";
+
+export type VideoMetadata = {
+  categories?: string[];
+  location?: string | null;
+  caption?: string | null;
+  [key: string]: unknown;
+};
 
 // Tables
 export const users = pgTable("users", {
@@ -33,8 +41,10 @@ export const videos = pgTable(
       .references(() => users.clerkId),
     caption: text("caption"),
     videoUrl: text("video_url").notNull(),
-    metadata: jsonb("metadata"),
-    embedding: vector("embedding", { dimensions: 1408 }), // 1408 for Google multimodal embeddings
+    metadata: jsonb("metadata").$type<VideoMetadata>(),
+    embedding: vector("embedding", {
+      dimensions: 1408,
+    }).$type<CreateEmbeddingResponse>(), // 1408 for Google multimodal embeddings
     viewsCount: bigint("views_count", { mode: "number" }),
     likesCount: bigint("likes_count", { mode: "number" }),
     commentsCount: bigint("comments_count", { mode: "number" }),

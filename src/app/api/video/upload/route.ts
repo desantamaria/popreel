@@ -1,6 +1,9 @@
 import { isAuthenticated } from "@/helpers/isAuthenticated";
+import { Logger } from "@/utils/logger";
 import { handleUpload, type HandleUploadBody } from "@vercel/blob/client";
 import { NextResponse } from "next/server";
+
+const logger = new Logger("Video Upload");
 
 export async function POST(request: Request): Promise<NextResponse> {
   const body = (await request.json()) as HandleUploadBody;
@@ -29,7 +32,7 @@ export async function POST(request: Request): Promise<NextResponse> {
         };
       },
       onUploadCompleted: async ({ blob, tokenPayload }) => {
-        console.log("blob upload completed", blob, tokenPayload);
+        logger.info("blob upload completed", { blob, tokenPayload });
         try {
           if (tokenPayload) {
             const { userId, uploadPath } = JSON.parse(tokenPayload);
