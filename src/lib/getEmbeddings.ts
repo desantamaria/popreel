@@ -1,31 +1,30 @@
 import { Logger } from "@/utils/logger";
 import { OpenAI } from "openai";
+import useSWR from "swr";
 
 const logger = new Logger("GetEmbeddings");
-const openai = new OpenAI({
-  apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY || process.env.OPENAI_API_KEY,
-  dangerouslyAllowBrowser: true,
-});
+
+const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
 
 export async function getOpenAIEmbeddings(input: string): Promise<number[]> {
-  logger.info("Getting OpenAI embeddings", {
-    responseLength: input.length,
-  });
   try {
-    const startTime = Date.now();
-    const embeddings = await openai.embeddings.create({
-      model: "text-embedding-3-small",
-      input: [input],
+    const response = await fetch(`${baseUrl}/api/embeddings`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        input: input,
+      }),
     });
 
-    const duration = Date.now() - startTime;
+    if (!response.ok) {
+      throw new Error(`HTTP error with status: ${response.status}`);
+    }
 
-    logger.info("OpenAI embeddings retrieved successfully", {
-      duration,
-      embeddingLength: embeddings.data.length,
-    });
+    const data = await response.json();
 
-    return embeddings.data[0].embedding;
+    return data.result;
   } catch (error) {
     logger.error("Failed to get OpenAI embeddings", { error });
     throw error;
