@@ -17,6 +17,7 @@ import {
 import { useDropzone } from "react-dropzone";
 import CategorySelect from "./category-select";
 import { getOpenAIEmbeddings } from "@/lib/getEmbeddings";
+import { toast } from "sonner";
 
 export default function VideoUpload({
   maxSize = 10,
@@ -82,6 +83,8 @@ export default function VideoUpload({
 
     // Add Video Entry to DB
     AddVideoToNeon(newBlob.url, inputMetadata, embedding);
+
+    toast.success("Video Uploaded Successful!");
     setLoading(false);
   }
 

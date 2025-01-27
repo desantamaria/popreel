@@ -11,7 +11,6 @@ import {
   varchar,
   vector,
 } from "drizzle-orm/pg-core";
-import { CreateEmbeddingResponse } from "openai/resources";
 
 export type VideoMetadata = {
   categories?: string[];
