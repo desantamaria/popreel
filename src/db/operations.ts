@@ -17,6 +17,9 @@ import {
 } from "./schema";
 import { db } from ".";
 import { eq } from "drizzle-orm";
+import { getOpenAIEmbeddings } from "@/lib/getEmbeddings";
+
+import { cosineDistance, desc, gt, sql } from "drizzle-orm";
 
 const logger = new Logger("db:operations");
 
@@ -28,7 +31,7 @@ export async function createUser(input: CreateUserInput) {
 }
 
 export async function getUser(id: string) {
-  const user = await db.select().from(users).where(eq(users.id, id));
+  const user = await db.select().from(users).where(eq(users.clerkId, id));
   return user[0];
 }
 
@@ -45,6 +48,53 @@ export async function createVideo(input: CreateVideoInput) {
   const { ...videoData } = input;
   const video = await db.insert(videos).values(videoData).returning();
   return video[0];
+}
+
+export async function findSimilarVideos(input: string) {
+  const embedding = await getOpenAIEmbeddings(input);
+  const similarity = sql<number>`1 - (${cosineDistance(
+    videos.embedding,
+    embedding
+  )})`;
+  const similarVideos = await db
+    .select({
+      id: videos.id,
+      userId: videos.userId,
+      caption: videos.caption,
+      videoUrl: videos.videoUrl,
+      metadata: videos.metadata,
+      embedding: videos.embedding,
+      viewsCount: videos.viewsCount,
+      likesCount: videos.likesCount,
+      commentsCount: videos.commentsCount,
+      sharesCount: videos.sharesCount,
+      bookmarksCount: videos.bookmarksCount,
+      createdAt: videos.createdAt,
+      updatedAt: videos.updatedAt,
+      similarity,
+    })
+    .from(videos)
+    .where(gt(similarity, 0.5))
+    .orderBy((t) => desc(t.similarity))
+    .limit(4);
+
+  const videoAggregations = similarVideos.map((video) => ({
+    id: video.id,
+    userId: video.userId,
+    caption: video.caption,
+    videoUrl: video.videoUrl,
+    metadata: video.metadata,
+    embedding: video.embedding,
+    viewsCount: video.viewsCount,
+    likesCount: video.likesCount,
+    commentsCount: video.commentsCount,
+    sharesCount: video.sharesCount,
+    bookmarksCount: video.bookmarksCount,
+    createdAt: video.createdAt,
+    updatedAt: video.updatedAt,
+  }));
+
+  return videoAggregations;
 }
 
 export async function getVideo(id: string) {

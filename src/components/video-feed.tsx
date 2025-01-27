@@ -1,14 +1,27 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, use } from "react";
 import { VideoPost } from "./video-post";
+import { useVideoStore } from "@/stores/video-store";
+import { FetchVideos } from "@/actions/fetchVideos";
 
 export function VideoFeed() {
   const [currentVideoIndex, setCurrentVideoIndex] = useState(0);
   const [isScrolling, setIsScrolling] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const videos = [
+  const { videos, setVideos } = useVideoStore();
+
+  useEffect(() => {
+    const callFetchVideos = async () => {
+      const newVideos = await FetchVideos();
+      console.log(newVideos);
+      setVideos(newVideos);
+    };
+    callFetchVideos();
+  }, []);
+
+  const mockVideos = [
     {
       id: 1,
       url: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4",
@@ -73,11 +86,32 @@ export function VideoFeed() {
         className="transition-transform duration-500 ease-in-out"
         style={{ height: `${videos.length * 100}vh` }}
       >
-        {videos.map((video, index) => (
-          <div key={video.id} className="snap-start h-screen">
-            <VideoPost {...video} isActive={index === currentVideoIndex} />
-          </div>
-        ))}
+        {videos.length > 1 ? (
+          <>
+            {videos.map((video, index) => (
+              <div key={video.id} className="snap-start h-screen">
+                <VideoPost
+                  url={video.videoUrl}
+                  caption={video.caption || ""}
+                  username={video.id}
+                  likes={`${video.likesCount}`}
+                  comments={`${video.commentsCount}`}
+                  shares={`${video.sharesCount}`}
+                  bookmarks={`${video.bookmarksCount}`}
+                  isActive={index === currentVideoIndex}
+                />
+              </div>
+            ))}{" "}
+          </>
+        ) : (
+          <>
+            {mockVideos.map((video, index) => (
+              <div key={video.id} className="snap-start h-screen">
+                <VideoPost {...video} isActive={index === currentVideoIndex} />
+              </div>
+            ))}
+          </>
+        )}
       </div>
     </div>
   );

@@ -3,7 +3,6 @@
 import { Button } from "@/components/ui/button";
 import { categoriesList } from "@/lib/categories";
 import { useVideoUploadStore } from "@/stores/video-upload-store";
-import { useState } from "react";
 
 export default function CategorySelect() {
   const { categories, setCategories } = useVideoUploadStore();
