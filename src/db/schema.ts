@@ -43,8 +43,8 @@ export const videos = pgTable(
     videoUrl: text("video_url").notNull(),
     metadata: jsonb("metadata").$type<VideoMetadata>(),
     embedding: vector("embedding", {
-      dimensions: 1408,
-    }).$type<CreateEmbeddingResponse>(), // 1408 for Google multimodal embeddings
+      dimensions: 1536,
+    }).$type<number[]>(), // 1536 for OpenAI embeddings
     viewsCount: bigint("views_count", { mode: "number" }),
     likesCount: bigint("likes_count", { mode: "number" }),
     commentsCount: bigint("comments_count", { mode: "number" }),

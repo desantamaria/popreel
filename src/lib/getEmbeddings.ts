@@ -1,13 +1,13 @@
 import { Logger } from "@/utils/logger";
 import { OpenAI } from "openai";
-import { CreateEmbeddingResponse } from "openai/resources/embeddings";
 
 const logger = new Logger("GetEmbeddings");
-const openai = new OpenAI();
+const openai = new OpenAI({
+  apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY || process.env.OPENAI_API_KEY,
+  dangerouslyAllowBrowser: true,
+});
 
-export async function getOpenAIEmbeddings(
-  input: string
-): Promise<CreateEmbeddingResponse> {
+export async function getOpenAIEmbeddings(input: string): Promise<number[]> {
   logger.info("Getting OpenAI embeddings", {
     responseLength: input.length,
   });
@@ -25,7 +25,7 @@ export async function getOpenAIEmbeddings(
       embeddingLength: embeddings.data.length,
     });
 
-    return embeddings;
+    return embeddings.data[0].embedding;
   } catch (error) {
     logger.error("Failed to get OpenAI embeddings", { error });
     throw error;

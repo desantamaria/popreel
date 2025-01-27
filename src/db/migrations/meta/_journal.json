@@ -15,6 +15,13 @@
       "when": 1737688222192,
       "tag": "0001_nervous_blue_shield",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1737940759391,
+      "tag": "0002_fearless_blackheart",
+      "breakpoints": true
     }
   ]
 }

@@ -1,0 +1,1 @@
+ALTER TABLE "videos" ALTER COLUMN "embedding" SET DATA TYPE vector(1536);

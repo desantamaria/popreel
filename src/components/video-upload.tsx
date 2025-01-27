@@ -80,8 +80,6 @@ export default function VideoUpload({
 
     const embedding = await getOpenAIEmbeddings(JSON.stringify(inputMetadata));
 
-    console.log(embedding);
-
     // Add Video Entry to DB
     AddVideoToNeon(newBlob.url, inputMetadata, embedding);
     setLoading(false);

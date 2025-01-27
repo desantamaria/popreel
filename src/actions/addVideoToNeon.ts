@@ -3,12 +3,11 @@
 import { createVideo } from "@/db/operations";
 import { CreateVideoInput, VideoMetadata } from "@/db/schema";
 import { isAuthenticated } from "@/helpers/isAuthenticated";
-import { CreateEmbeddingResponse } from "openai/resources";
 
 export async function AddVideoToNeon(
   url: string,
   metadata: VideoMetadata,
-  embedding: CreateEmbeddingResponse
+  embedding: number[]
 ) {
   const userId = await isAuthenticated();
   const newVideo = {
