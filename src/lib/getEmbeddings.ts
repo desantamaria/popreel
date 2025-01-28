@@ -1,6 +1,4 @@
 import { Logger } from "@/utils/logger";
-import { OpenAI } from "openai";
-import useSWR from "swr";
 
 const logger = new Logger("GetEmbeddings");
 

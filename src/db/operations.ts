@@ -20,6 +20,7 @@ import { eq } from "drizzle-orm";
 import { getOpenAIEmbeddings } from "@/lib/getEmbeddings";
 
 import { cosineDistance, desc, gt, sql } from "drizzle-orm";
+import { Delete } from "@/lib/vercel-blob";
 
 const logger = new Logger("db:operations");
 
@@ -110,6 +111,11 @@ export async function updateVideo(
 }
 
 export async function deleteVideo(id: string) {
+  const video = await getVideo(id);
+  const result = await Delete(video.videoUrl);
+  if (!result) {
+    logger.error("Error Deleting File from Vercel Blob");
+  }
   await db.delete(videos).where(eq(videos.id, id));
 }
 
