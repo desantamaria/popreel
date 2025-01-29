@@ -1,5 +1,5 @@
 import { FeedSidebar } from "@/components/feed-sidebar";
-import { VideoFeed } from "@/components/video-feed";
+import { VideoFeed } from "@/components/video/video-feed";
 
 export default function FeedPage() {
   return (

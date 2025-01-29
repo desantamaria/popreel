@@ -86,9 +86,9 @@ export function VideoFeed() {
         className="transition-transform duration-500 ease-in-out"
         style={{ height: `${videos.length * 100}vh` }}
       >
-        {videos.length > 1 ? (
+        {videos.length == -1 ? (
           <>
-            {videos.map((video, index) => (
+            {/* {videos.map((video, index) => (
               <div key={video.id} className="snap-start h-screen">
                 <VideoPost
                   url={video.videoUrl}
@@ -101,7 +101,7 @@ export function VideoFeed() {
                   isActive={index === currentVideoIndex}
                 />
               </div>
-            ))}{" "}
+            ))}{" "} */}
           </>
         ) : (
           <>

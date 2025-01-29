@@ -15,7 +15,7 @@ import {
   Video,
 } from "lucide-react";
 import { useDropzone } from "react-dropzone";
-import CategorySelect from "./category-select";
+import CategorySelect from "../category-select";
 import { getOpenAIEmbeddings } from "@/lib/getEmbeddings";
 import { toast } from "sonner";
 

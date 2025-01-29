@@ -1,12 +1,12 @@
 "use server";
 
 import { createVideo } from "@/db/operations";
-import { CreateVideoInput, VideoMetadata } from "@/db/schema";
+import { CreateVideoInput } from "@/db/schema";
 import { isAuthenticated } from "@/helpers/isAuthenticated";
 
 export async function AddVideoToNeon(
   url: string,
-  metadata: VideoMetadata,
+  metadata: JSON,
   embedding: number[]
 ) {
   const userId = await isAuthenticated();

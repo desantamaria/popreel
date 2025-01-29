@@ -1,8 +1,7 @@
-import { InferInsertModel, InferSelectModel, relations } from "drizzle-orm";
+import { InferInsertModel, InferSelectModel } from "drizzle-orm";
 import {
   bigint,
-  index,
-  integer,
+  boolean,
   jsonb,
   pgTable,
   text,
@@ -12,196 +11,78 @@ import {
   vector,
 } from "drizzle-orm/pg-core";
 
-export type VideoMetadata = {
-  categories?: string[];
-  location?: string | null;
-  caption?: string | null;
-  [key: string]: unknown;
-};
-
 // Tables
 export const users = pgTable("users", {
-  id: uuid("id").defaultRandom().primaryKey(),
-  clerkId: text("clerk_id").notNull().unique(),
-  username: varchar("username").notNull().unique(),
-  avatarUrl: text("avatar_url"),
+  id: text("clerk_id").primaryKey(),
+  username: varchar("username", { length: 30 }).notNull().unique(),
+  email: varchar("email", { length: 255 }).notNull().unique(),
+  fullName: varchar("full_name", { length: 255 }),
   bio: text("bio"),
-  metadata: jsonb("metadata"),
-  createdAt: timestamp("created_at"),
-  updatedAt: timestamp("updated_at"),
+  avatarUrl: text("avatar_url"),
+  metadata: jsonb("metadata").default({}),
+  isVerified: boolean("is_verified").default(false),
+  isPrivate: boolean("is_private").default(false),
+  lastSeenAt: timestamp("last_seen_at").notNull().default(new Date()),
+  createdAt: timestamp("created_at").notNull().default(new Date()),
+  updatedAt: timestamp("updated_at").notNull().default(new Date()),
 });
 
-export const videos = pgTable(
-  "videos",
-  {
-    id: uuid("id").defaultRandom().primaryKey(),
-    userId: text("user_id")
-      .notNull()
-      .references(() => users.clerkId),
-    caption: text("caption"),
-    videoUrl: text("video_url").notNull(),
-    metadata: jsonb("metadata").$type<VideoMetadata>(),
-    embedding: vector("embedding", {
-      dimensions: 1536,
-    }).$type<number[]>(), // 1536 for OpenAI embeddings
-    viewsCount: bigint("views_count", { mode: "number" }),
-    likesCount: bigint("likes_count", { mode: "number" }),
-    commentsCount: bigint("comments_count", { mode: "number" }),
-    sharesCount: bigint("shares_count", { mode: "number" }),
-    bookmarksCount: bigint("bookmarks_count", { mode: "number" }),
-    createdAt: timestamp("created_at"),
-    updatedAt: timestamp("updated_at"),
-  },
-  (table) => ({
-    embeddingIndex: index("embedding_index").using(
-      "hnsw",
-      table.embedding.op("vector_cosine_ops")
-    ),
-  })
-);
-
-export const views = pgTable("views", {
+export const videos = pgTable("videos", {
   id: uuid("id").defaultRandom().primaryKey(),
-  userId: text("user_id")
-    .notNull()
-    .references(() => users.clerkId),
-  videoId: uuid("video_id")
-    .notNull()
-    .references(() => videos.id),
-  watchDuration: integer("watch_duration"),
-  createdAt: timestamp("created_at"),
-  updatedAt: timestamp("updated_at"),
+  userId: text("user_id").references(() => users.id),
+  caption: text("caption"),
+  videoUrl: text("video_url").notNull().unique(),
+  metadata: jsonb("metadata").default({}),
+  embedding: vector("embedding", {
+    dimensions: 1536,
+  }).$type<number[]>(), // 1536 for OpenAI embeddings
+  createdAt: timestamp("created_at").notNull().default(new Date()),
+  updatedAt: timestamp("updated_at").notNull().default(new Date()),
 });
 
-export const likes = pgTable("likes", {
+export const videoAnalytics = pgTable("video_analytics", {
   id: uuid("id").defaultRandom().primaryKey(),
-  userId: text("user_id")
-    .notNull()
-    .references(() => users.clerkId),
-  videoId: uuid("video_id")
-    .notNull()
-    .references(() => videos.id),
-  createdAt: timestamp("created_at"),
-  updatedAt: timestamp("updated_at"),
+  videoId: uuid("video_id").references(() => videos.id),
+  totalViews: bigint("total_views", { mode: "number" }),
+  totalLikes: bigint("total_likes", { mode: "number" }),
+  totalComments: bigint("total_comments", { mode: "number" }),
+  totalShares: bigint("total_shares", { mode: "number" }),
+  createdAt: timestamp("created_at").notNull().default(new Date()),
+  updatedAt: timestamp("updated_at").notNull().default(new Date()),
+});
+
+export const videoInteractions = pgTable("video_interactions", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  userId: text("user_id").references(() => users.id),
+  videoId: uuid("video_id").references(() => videos.id),
+  interactionType: varchar("interaction_type", { length: 30 }),
+  metadata: jsonb("metadata").default({}),
+  viewDuration: bigint("view_Duration", { mode: "number" }),
+  watchPercentage: bigint("watch_percentage", { mode: "number" }),
+  interactionStrength: bigint("interaction_strength", { mode: "number" }),
+  audienceDemographic: jsonb("audience_demographic").default({}),
+  hourlyViews: jsonb("hourly_views").default({}),
+  dailyViews: jsonb("daily_views").default({}),
+  popularityScore: jsonb("popularity_score").default({}),
+  createdAt: timestamp("created_at").notNull().default(new Date()),
+  updatedAt: timestamp("updated_at").notNull().default(new Date()),
 });
 
 export const comments = pgTable("comments", {
   id: uuid("id").defaultRandom().primaryKey(),
-  userId: text("user_id")
-    .notNull()
-    .references(() => users.clerkId),
-  videoId: uuid("video_id")
-    .notNull()
-    .references(() => videos.id),
+  userId: text("user_id").references(() => users.id),
+  videoId: uuid("video_id").references(() => videos.id),
   content: text("content"),
-  createdAt: timestamp("created_at"),
-  updatedAt: timestamp("updated_at"),
+  totalLikes: bigint("total_likes", { mode: "number" }),
+  createdAt: timestamp("created_at").notNull().default(new Date()),
+  updatedAt: timestamp("updated_at").notNull().default(new Date()),
 });
-
-export const shares = pgTable("shares", {
-  id: uuid("id").defaultRandom().primaryKey(),
-  userId: text("user_id")
-    .notNull()
-    .references(() => users.clerkId),
-  videoId: uuid("video_id")
-    .notNull()
-    .references(() => videos.id),
-  sharePlatform: varchar("share_platform"),
-  createdAt: timestamp("created_at"),
-  updatedAt: timestamp("updated_at"),
-});
-
-export const bookmarks = pgTable("bookmarks", {
-  id: uuid("id").defaultRandom().primaryKey(),
-  userId: text("user_id")
-    .notNull()
-    .references(() => users.clerkId),
-  videoId: uuid("video_id")
-    .notNull()
-    .references(() => videos.id),
-  createdAt: timestamp("created_at"),
-  updatedAt: timestamp("updated_at"),
-});
-
-// Relations
-export const usersRelations = relations(users, ({ many }) => ({
-  videos: many(videos),
-  views: many(views),
-  likes: many(likes),
-  comments: many(comments),
-  shares: many(shares),
-  bookmarks: many(bookmarks),
-}));
-
-export const videosRelations = relations(videos, ({ one, many }) => ({
-  users: one(users, {
-    fields: [videos.userId],
-    references: [users.clerkId],
-  }),
-  views: many(views),
-  likes: many(likes),
-  comments: many(comments),
-  shares: many(shares),
-  bookmarks: many(bookmarks),
-}));
-
-export const likesRelations = relations(likes, ({ one }) => ({
-  users: one(users, {
-    fields: [likes.userId],
-    references: [users.clerkId],
-  }),
-  videos: one(videos, {
-    fields: [likes.videoId],
-    references: [videos.id],
-  }),
-}));
-
-export const commentsRelations = relations(views, ({ one }) => ({
-  users: one(users, {
-    fields: [views.userId],
-    references: [users.clerkId],
-  }),
-  videos: one(videos, {
-    fields: [views.videoId],
-    references: [videos.id],
-  }),
-}));
-
-export const sharesRelations = relations(shares, ({ one }) => ({
-  users: one(users, {
-    fields: [shares.userId],
-    references: [users.clerkId],
-  }),
-  videos: one(videos, {
-    fields: [shares.videoId],
-    references: [videos.id],
-  }),
-}));
-
-export const bookmarksRelations = relations(bookmarks, ({ one }) => ({
-  users: one(users, {
-    fields: [bookmarks.userId],
-    references: [users.clerkId],
-  }),
-  videos: one(videos, {
-    fields: [bookmarks.videoId],
-    references: [videos.id],
-  }),
-}));
 
 // Types
 export type UserAggregation = InferSelectModel<typeof users>;
 export type VideoAggregation = InferSelectModel<typeof videos>;
-export type ViewAggregation = InferSelectModel<typeof views>;
-export type LikeAggregation = InferSelectModel<typeof likes>;
 export type CommentAggregation = InferSelectModel<typeof comments>;
-export type ShareAggregation = InferSelectModel<typeof shares>;
-export type BookmarkAggregation = InferSelectModel<typeof bookmarks>;
 
 export type CreateUserInput = InferInsertModel<typeof users>;
 export type CreateVideoInput = InferInsertModel<typeof videos>;
-export type CreateViewInput = InferInsertModel<typeof views>;
-export type CreateLikeInput = InferInsertModel<typeof likes>;
 export type CreateCommentInput = InferInsertModel<typeof comments>;
-export type CreateShareInput = InferInsertModel<typeof shares>;
-export type CreateBookmarkInput = InferInsertModel<typeof bookmarks>;
