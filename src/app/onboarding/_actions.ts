@@ -6,10 +6,11 @@ import { auth, clerkClient } from "@clerk/nextjs/server";
 type OnboardingData = {
   username: string;
   selectedInterests: string[];
+  email: string;
 };
 
 export const completeOnboarding = async (onboardingData: OnboardingData) => {
-  const { userId } = await auth();
+  const { userId, sessionClaims } = await auth();
 
   if (!userId) {
     return { message: "No Logged In User" };
@@ -20,8 +21,9 @@ export const completeOnboarding = async (onboardingData: OnboardingData) => {
   try {
     const newUserId = await createUser({
       username: onboardingData.username,
-      clerkId: userId,
-      metadata: { selectedInterests: onboardingData.selectedInterests },
+      id: userId,
+      email: onboardingData.email,
+      metadata: { interests: onboardingData.selectedInterests },
     });
 
     if (!newUserId) {

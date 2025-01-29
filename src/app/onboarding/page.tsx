@@ -24,17 +24,26 @@ const MINIMUM_SELECTIONS = 3;
 export default function OnboardingCarousel() {
   const [username, setUsername] = useState<string>("");
   const [selectedInterests, setSelectedInterests] = useState<string[]>([]);
+  const [email, setEmail] = useState<string>("");
 
   const { user } = useUser();
   const router = useRouter();
 
   const handleSubmit = async () => {
-    if (selectedInterests.length < MINIMUM_SELECTIONS || username.length < 2) {
+    if (
+      selectedInterests.length < MINIMUM_SELECTIONS ||
+      username.length < 2 ||
+      !isValidEmail(email)
+    ) {
       toast.error("Please complete all steps before submitting.");
       return;
     }
 
-    const res = await completeOnboarding({ username, selectedInterests });
+    const res = await completeOnboarding({
+      username,
+      selectedInterests,
+      email,
+    });
     if (res?.message) {
       await user?.reload();
       router.push("/feed");
@@ -53,6 +62,7 @@ export default function OnboardingCarousel() {
     });
   };
 
+  const isEmailValid = isValidEmail(email);
   const isUsernameValid = username.length >= 2;
   const areInterestsValid = selectedInterests.length >= MINIMUM_SELECTIONS;
 
@@ -79,6 +89,20 @@ export default function OnboardingCarousel() {
                       <AlertDescription>
                         Username must be at least 2 characters long.
                       </AlertDescription>
+                    </Alert>
+                  )}
+                  <h2 className="text-2xl font-bold mb-4">Enter an email</h2>
+                  <Input
+                    type="text"
+                    placeholder="Enter your email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="mb-4"
+                  />
+                  {!isEmailValid && (
+                    <Alert variant="destructive" className="mb-4">
+                      <AlertCircle className="h-4 w-4" />
+                      <AlertDescription>Email is not valid.</AlertDescription>
                     </Alert>
                   )}
                 </div>
@@ -152,4 +176,9 @@ export default function OnboardingCarousel() {
       </Card>
     </div>
   );
+}
+
+function isValidEmail(email: string): boolean {
+  const emailRegex: RegExp = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  return emailRegex.test(email);
 }

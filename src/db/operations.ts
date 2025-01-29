@@ -1,26 +1,16 @@
 import { Logger } from "@/utils/logger";
+import { eq } from "drizzle-orm";
+import { db } from ".";
+
+import { Delete } from "@/lib/vercel-blob";
 import {
+  comments,
+  CreateCommentInput,
   CreateUserInput,
   CreateVideoInput,
-  CreateViewInput,
-  CreateLikeInput,
-  CreateCommentInput,
-  CreateShareInput,
-  CreateBookmarkInput,
   users,
   videos,
-  views,
-  likes,
-  comments,
-  shares,
-  bookmarks,
 } from "./schema";
-import { db } from ".";
-import { eq } from "drizzle-orm";
-import { getOpenAIEmbeddings } from "@/lib/getEmbeddings";
-
-import { cosineDistance, desc, gt, sql } from "drizzle-orm";
-import { Delete } from "@/lib/vercel-blob";
 
 const logger = new Logger("db:operations");
 
@@ -32,7 +22,7 @@ export async function createUser(input: CreateUserInput) {
 }
 
 export async function getUser(id: string) {
-  const user = await db.select().from(users).where(eq(users.clerkId, id));
+  const user = await db.select().from(users).where(eq(users.id, id));
   return user[0];
 }
 
@@ -49,53 +39,6 @@ export async function createVideo(input: CreateVideoInput) {
   const { ...videoData } = input;
   const video = await db.insert(videos).values(videoData).returning();
   return video[0];
-}
-
-export async function findSimilarVideos(input: string) {
-  const embedding = await getOpenAIEmbeddings(input);
-  const similarity = sql<number>`1 - (${cosineDistance(
-    videos.embedding,
-    embedding
-  )})`;
-  const similarVideos = await db
-    .select({
-      id: videos.id,
-      userId: videos.userId,
-      caption: videos.caption,
-      videoUrl: videos.videoUrl,
-      metadata: videos.metadata,
-      embedding: videos.embedding,
-      viewsCount: videos.viewsCount,
-      likesCount: videos.likesCount,
-      commentsCount: videos.commentsCount,
-      sharesCount: videos.sharesCount,
-      bookmarksCount: videos.bookmarksCount,
-      createdAt: videos.createdAt,
-      updatedAt: videos.updatedAt,
-      similarity,
-    })
-    .from(videos)
-    .where(gt(similarity, 0.5))
-    .orderBy((t) => desc(t.similarity))
-    .limit(4);
-
-  const videoAggregations = similarVideos.map((video) => ({
-    id: video.id,
-    userId: video.userId,
-    caption: video.caption,
-    videoUrl: video.videoUrl,
-    metadata: video.metadata,
-    embedding: video.embedding,
-    viewsCount: video.viewsCount,
-    likesCount: video.likesCount,
-    commentsCount: video.commentsCount,
-    sharesCount: video.sharesCount,
-    bookmarksCount: video.bookmarksCount,
-    createdAt: video.createdAt,
-    updatedAt: video.updatedAt,
-  }));
-
-  return videoAggregations;
 }
 
 export async function getVideo(id: string) {
@@ -119,46 +62,6 @@ export async function deleteVideo(id: string) {
   await db.delete(videos).where(eq(videos.id, id));
 }
 
-// View Operations
-export async function createView(input: CreateViewInput) {
-  const { ...viewData } = input;
-  const view = await db.insert(views).values(viewData).returning();
-  return view[0];
-}
-
-export async function getView(id: string) {
-  const view = await db.select().from(views).where(eq(views.id, id));
-  return view[0];
-}
-
-export async function updateView(id: string, input: Partial<CreateViewInput>) {
-  await db.update(views).set(input).where(eq(views.id, id));
-}
-
-export async function deleteView(id: string) {
-  await db.delete(views).where(eq(views.id, id));
-}
-
-// Like Operations
-export async function createLike(input: CreateLikeInput) {
-  const { ...likeData } = input;
-  const like = await db.insert(likes).values(likeData).returning();
-  return like[0];
-}
-
-export async function getLike(id: string) {
-  const like = await db.select().from(likes).where(eq(likes.id, id));
-  return like[0];
-}
-
-export async function updateLike(id: string, input: Partial<CreateLikeInput>) {
-  await db.update(likes).set(input).where(eq(likes.id, id));
-}
-
-export async function deleteLike(id: string) {
-  await db.delete(likes).where(eq(likes.id, id));
-}
-
 // Comment Operations
 export async function createComment(input: CreateCommentInput) {
   const { ...commentData } = input;
@@ -180,53 +83,4 @@ export async function updateComment(
 
 export async function deleteComment(id: string) {
   await db.delete(comments).where(eq(comments.id, id));
-}
-
-// Share Operations
-export async function createShare(input: CreateShareInput) {
-  const { ...shareData } = input;
-  const share = await db.insert(shares).values(shareData).returning();
-  return share[0];
-}
-
-export async function getShare(id: string) {
-  const share = await db.select().from(shares).where(eq(shares.id, id));
-  return share[0];
-}
-
-export async function updateShare(
-  id: string,
-  input: Partial<CreateShareInput>
-) {
-  await db.update(shares).set(input).where(eq(shares.id, id));
-}
-
-export async function deleteShare(id: string) {
-  await db.delete(shares).where(eq(shares.id, id));
-}
-
-// Bookmark Operations
-export async function createBookmark(input: CreateBookmarkInput) {
-  const { ...bookmarkData } = input;
-  const bookmark = await db.insert(bookmarks).values(bookmarkData).returning();
-  return bookmark[0];
-}
-
-export async function getBookmark(id: string) {
-  const bookmark = await db
-    .select()
-    .from(bookmarks)
-    .where(eq(bookmarks.id, id));
-  return bookmark[0];
-}
-
-export async function updateBookmark(
-  id: string,
-  input: Partial<CreateBookmarkInput>
-) {
-  await db.update(bookmarks).set(input).where(eq(bookmarks.id, id));
-}
-
-export async function deleteBookmark(id: string) {
-  await db.delete(bookmarks).where(eq(bookmarks.id, id));
 }
