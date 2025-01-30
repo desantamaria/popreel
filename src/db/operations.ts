@@ -16,9 +16,8 @@ const logger = new Logger("db:operations");
 
 // User Operations
 export async function createUser(input: CreateUserInput) {
-  const { ...userData } = input;
-  const user = await db.insert(users).values(userData).returning();
-  return user[0];
+  const user = await db.insert(users).values(input).returning();
+  return user[0].id;
 }
 
 export async function getUser(id: string) {

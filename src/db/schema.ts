@@ -19,7 +19,10 @@ export const users = pgTable("users", {
   fullName: varchar("full_name", { length: 255 }),
   bio: text("bio"),
   avatarUrl: text("avatar_url"),
-  metadata: jsonb("metadata").default({}),
+  metadata: jsonb("metadata"),
+  embedding: vector("embedding", {
+    dimensions: 1536,
+  }),
   isVerified: boolean("is_verified").default(false),
   isPrivate: boolean("is_private").default(false),
   lastSeenAt: timestamp("last_seen_at").notNull().default(new Date()),
@@ -29,13 +32,20 @@ export const users = pgTable("users", {
 
 export const videos = pgTable("videos", {
   id: uuid("id").defaultRandom().primaryKey(),
-  userId: text("user_id").references(() => users.id),
+  userId: text("user_id")
+    .references(() => users.id)
+    .notNull(),
   caption: text("caption"),
   videoUrl: text("video_url").notNull().unique(),
-  metadata: jsonb("metadata").default({}),
+  videoSize: bigint("video_size", { mode: "number" }),
+  videoLength: text("video_length"),
+  transcription: text("transcription"),
+  summary: text("summary"),
+  tags: text("tags").array(),
+  metadata: jsonb("metadata").$type<Record<string, unknown> | null>(),
   embedding: vector("embedding", {
     dimensions: 1536,
-  }).$type<number[]>(), // 1536 for OpenAI embeddings
+  }),
   createdAt: timestamp("created_at").notNull().default(new Date()),
   updatedAt: timestamp("updated_at").notNull().default(new Date()),
 });
@@ -56,14 +66,14 @@ export const videoInteractions = pgTable("video_interactions", {
   userId: text("user_id").references(() => users.id),
   videoId: uuid("video_id").references(() => videos.id),
   interactionType: varchar("interaction_type", { length: 30 }),
-  metadata: jsonb("metadata").default({}),
+  metadata: jsonb("metadata"),
   viewDuration: bigint("view_Duration", { mode: "number" }),
   watchPercentage: bigint("watch_percentage", { mode: "number" }),
   interactionStrength: bigint("interaction_strength", { mode: "number" }),
-  audienceDemographic: jsonb("audience_demographic").default({}),
-  hourlyViews: jsonb("hourly_views").default({}),
-  dailyViews: jsonb("daily_views").default({}),
-  popularityScore: jsonb("popularity_score").default({}),
+  audienceDemographic: jsonb("audience_demographic"),
+  hourlyViews: jsonb("hourly_views"),
+  dailyViews: jsonb("daily_views"),
+  popularityScore: jsonb("popularity_score"),
   createdAt: timestamp("created_at").notNull().default(new Date()),
   updatedAt: timestamp("updated_at").notNull().default(new Date()),
 });

@@ -3,7 +3,6 @@
 import { useState, useRef, useEffect, use } from "react";
 import { VideoPost } from "./video-post";
 import { useVideoStore } from "@/stores/video-store";
-import { FetchVideos } from "@/actions/fetchVideos";
 
 export function VideoFeed() {
   const [currentVideoIndex, setCurrentVideoIndex] = useState(0);
@@ -14,9 +13,9 @@ export function VideoFeed() {
 
   useEffect(() => {
     const callFetchVideos = async () => {
-      const newVideos = await FetchVideos();
-      console.log(newVideos);
-      setVideos(newVideos);
+      //   const newVideos = await FetchVideos();
+      //   console.log(newVideos);
+      //   setVideos(newVideos);
     };
     callFetchVideos();
   }, []);

@@ -13,6 +13,8 @@ const envSchema = z.object({
   NEXT_PUBLIC_CLERK_SIGN_UP_FORCE_REDIRECT_URL: z.string(),
   DATABASE_URL: z.string(),
   OPENAI_API_KEY: z.string(),
+  GEMINI_API_KEY: z.string(),
+  GROQ_API_KEY: z.string(),
 });
 
 // Function to validate environment variables
@@ -31,6 +33,8 @@ const validateEnv = () => {
         process.env.NEXT_PUBLIC_CLERK_SIGN_UP_FORCE_REDIRECT_URL,
       DATABASE_URL: process.env.DATABASE_URL,
       OPENAI_API_KEY: process.env.OPENAI_API_KEY,
+      GEMINI_API_KEY: process.env.GEMINI_API_KEY,
+      GROQ_API_KEY: process.env.GROQ_API_KEY,
     };
     const parsed = envSchema.parse(env);
     logger.info("Environment variables validated successfully");
