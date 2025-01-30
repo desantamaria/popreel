@@ -1,6 +1,7 @@
 import { db } from "@/db";
 import { users, videos } from "@/db/schema";
 import { Logger } from "@/utils/logger";
+import { del } from "@vercel/blob";
 import { and, desc, eq, inArray, isNotNull } from "drizzle-orm";
 
 const logger = new Logger("VideoService");
@@ -162,6 +163,7 @@ export class VideoService {
     }
   }
 
+  // TODO Implement Get Video
   static async getVideo(id: string): Promise<VideoMetadata | null> {
     try {
       logger.info("Fetching video metadata", { id });
@@ -300,22 +302,31 @@ export class VideoService {
     }
   }
 
-  // TODO Implement Delete Video
-  static async deleteVideo(id: string) {}
+  static async deleteVideo(id: string) {
+    logger.info("Deleting video", id);
 
-  // TODO Implement Update Video
-  static async updateVideo(
-    id: string,
-    {
-      transcription,
-      summary,
-      tags,
-      embeddings,
-    }: {
-      transcription?: string;
-      summary?: string;
-      tags?: string[];
-      embeddings?: number[];
-    }
-  ) {}
+    const videoData = await db
+      .select()
+      .from(videos)
+      .where(eq(videos.id, id))
+      .limit(1);
+
+    logger.info("Deleting video from Vercel Blob");
+    await del(videoData[0].videoUrl);
+
+    await db.delete(videos).where(eq(videos.id, id));
+
+    logger.info("Deleted video successfully", id);
+  }
+
+  static async updateVideo(id: string, data: Partial<VideoMetadata>) {
+    logger.info("Updating video", id);
+    const { transcription, summary, tags, embedding } = data;
+    await db
+      .update(videos)
+      .set({ transcription, summary, tags, embedding })
+      .where(and(eq(videos.id, id)));
+
+    logger.info("Updated video successfully", id);
+  }
 }

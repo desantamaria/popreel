@@ -137,7 +137,7 @@ export async function createVideo(formData: FormData) {
       transcription: transcription || undefined,
       summary: summary || undefined,
       tags: tags || undefined,
-      embeddings: embedding || undefined,
+      embedding: embedding || undefined,
     });
 
     logger.info("Video creation completed", { videoId: video.id });
