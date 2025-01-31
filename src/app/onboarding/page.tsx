@@ -17,24 +17,19 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { categoriesList } from "@/lib/categories";
-import { completeOnboarding } from "@/app/onboarding/_actions";
+import { completeOnboarding } from "@/app/actions/onboarding";
 
 const MINIMUM_SELECTIONS = 3;
 
 export default function OnboardingCarousel() {
   const [username, setUsername] = useState<string>("");
   const [selectedInterests, setSelectedInterests] = useState<string[]>([]);
-  const [email, setEmail] = useState<string>("");
 
   const { user } = useUser();
   const router = useRouter();
 
   const handleSubmit = async () => {
-    if (
-      selectedInterests.length < MINIMUM_SELECTIONS ||
-      username.length < 2 ||
-      !isValidEmail(email)
-    ) {
+    if (selectedInterests.length < MINIMUM_SELECTIONS || username.length < 2) {
       toast.error("Please complete all steps before submitting.");
       return;
     }
@@ -42,7 +37,6 @@ export default function OnboardingCarousel() {
     const res = await completeOnboarding({
       username,
       selectedInterests,
-      email,
     });
     if (res?.message) {
       await user?.reload();
@@ -62,7 +56,6 @@ export default function OnboardingCarousel() {
     });
   };
 
-  const isEmailValid = isValidEmail(email);
   const isUsernameValid = username.length >= 2;
   const areInterestsValid = selectedInterests.length >= MINIMUM_SELECTIONS;
 
@@ -89,20 +82,6 @@ export default function OnboardingCarousel() {
                       <AlertDescription>
                         Username must be at least 2 characters long.
                       </AlertDescription>
-                    </Alert>
-                  )}
-                  <h2 className="text-2xl font-bold mb-4">Enter an email</h2>
-                  <Input
-                    type="text"
-                    placeholder="Enter your email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="mb-4"
-                  />
-                  {!isEmailValid && (
-                    <Alert variant="destructive" className="mb-4">
-                      <AlertCircle className="h-4 w-4" />
-                      <AlertDescription>Email is not valid.</AlertDescription>
                     </Alert>
                   )}
                 </div>

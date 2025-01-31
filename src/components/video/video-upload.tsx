@@ -1,3 +1,6 @@
+"use client";
+
+import { createVideo } from "@/app/actions/video";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -5,7 +8,6 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useVideoUploadStore } from "@/stores/video-upload-store";
 import type { VideoUploadProps } from "@/types/video";
-import { upload } from "@vercel/blob/client";
 import {
   RatioIcon as AspectRatio,
   FileType,
@@ -14,9 +16,8 @@ import {
   Video,
 } from "lucide-react";
 import { useDropzone } from "react-dropzone";
-import CategorySelect from "../category-select";
-import { getOpenAIEmbeddings } from "@/lib/getEmbeddings";
 import { toast } from "sonner";
+import CategorySelect from "../category-select";
 
 export default function VideoUpload({
   maxSize = 10,
@@ -66,22 +67,7 @@ export default function VideoUpload({
     }
     setLoading(true);
 
-    // Upload to Vercel Blob
-    const newBlob = await upload(file.name, file, {
-      access: "public",
-      handleUploadUrl: "/api/video/upload",
-    });
-
-    const inputMetadata = {
-      categories: categories,
-      location: location,
-      caption: caption,
-    };
-
-    const embedding = await getOpenAIEmbeddings(JSON.stringify(inputMetadata));
-
-    // Add Video Entry to DB
-    // AddVideoToNeon(newBlob.url, inputMetadata, embedding);
+    createVideo(file, caption || "");
 
     toast.success("Video Uploaded Successful!");
     setLoading(false);

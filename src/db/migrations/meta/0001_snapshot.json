@@ -1,6 +1,6 @@
 {
-  "id": "a05049bf-fc40-4678-8730-6e7968c3731c",
-  "prevId": "00000000-0000-0000-0000-000000000000",
+  "id": "1b99c050-1fd1-47a1-8eaa-194d3ec92779",
+  "prevId": "a05049bf-fc40-4678-8730-6e7968c3731c",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -44,14 +44,14 @@
           "type": "timestamp",
           "primaryKey": false,
           "notNull": true,
-          "default": "'2025-01-31 01:43:58.578'"
+          "default": "'2025-01-31 01:44:17.755'"
         },
         "updated_at": {
           "name": "updated_at",
           "type": "timestamp",
           "primaryKey": false,
           "notNull": true,
-          "default": "'2025-01-31 01:43:58.578'"
+          "default": "'2025-01-31 01:44:17.755'"
         }
       },
       "indexes": {},
@@ -160,21 +160,21 @@
           "type": "timestamp",
           "primaryKey": false,
           "notNull": true,
-          "default": "'2025-01-31 01:43:58.576'"
+          "default": "'2025-01-31 01:44:17.754'"
         },
         "created_at": {
           "name": "created_at",
           "type": "timestamp",
           "primaryKey": false,
           "notNull": true,
-          "default": "'2025-01-31 01:43:58.576'"
+          "default": "'2025-01-31 01:44:17.754'"
         },
         "updated_at": {
           "name": "updated_at",
           "type": "timestamp",
           "primaryKey": false,
           "notNull": true,
-          "default": "'2025-01-31 01:43:58.576'"
+          "default": "'2025-01-31 01:44:17.754'"
         }
       },
       "indexes": {},
@@ -246,14 +246,14 @@
           "type": "timestamp",
           "primaryKey": false,
           "notNull": true,
-          "default": "'2025-01-31 01:43:58.577'"
+          "default": "'2025-01-31 01:44:17.755'"
         },
         "updated_at": {
           "name": "updated_at",
           "type": "timestamp",
           "primaryKey": false,
           "notNull": true,
-          "default": "'2025-01-31 01:43:58.577'"
+          "default": "'2025-01-31 01:44:17.755'"
         }
       },
       "indexes": {},
@@ -360,14 +360,14 @@
           "type": "timestamp",
           "primaryKey": false,
           "notNull": true,
-          "default": "'2025-01-31 01:43:58.577'"
+          "default": "'2025-01-31 01:44:17.755'"
         },
         "updated_at": {
           "name": "updated_at",
           "type": "timestamp",
           "primaryKey": false,
           "notNull": true,
-          "default": "'2025-01-31 01:43:58.577'"
+          "default": "'2025-01-31 01:44:17.755'"
         }
       },
       "indexes": {},
@@ -481,14 +481,14 @@
           "type": "timestamp",
           "primaryKey": false,
           "notNull": true,
-          "default": "'2025-01-31 01:43:58.577'"
+          "default": "'2025-01-31 01:44:17.755'"
         },
         "updated_at": {
           "name": "updated_at",
           "type": "timestamp",
           "primaryKey": false,
           "notNull": true,
-          "default": "'2025-01-31 01:43:58.577'"
+          "default": "'2025-01-31 01:44:17.755'"
         }
       },
       "indexes": {},

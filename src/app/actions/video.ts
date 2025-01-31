@@ -5,7 +5,7 @@ import { db } from "@/db";
 import { videos } from "@/db/schema";
 import { VideoMetadata, VideoService } from "@/lib/services/video";
 import { Logger } from "@/utils/logger";
-import { auth } from "@clerk/nextjs/dist/types/server";
+import { auth } from "@clerk/nextjs/server";
 import { Part, VertexAI } from "@google-cloud/vertexai";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { del, put } from "@vercel/blob";
@@ -53,13 +53,10 @@ export async function deleteVideo(videoUrl: string) {
   }
 }
 
-export async function createVideo(formData: FormData) {
+export async function createVideo(file: File, caption: string) {
   const session = await auth();
   const userId = session?.userId;
   if (!userId) throw new Error("Unauthorized");
-
-  const file = formData.get("video") as File;
-  const caption = formData.get("caption") as string;
 
   if (!file || !caption) {
     throw new Error("Missing required fields");

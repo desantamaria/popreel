@@ -12,7 +12,13 @@ const logger = new Logger("DB:Operations");
 async function dropAllTables(db: any) {
   logger.info("Dropping all existing tables...");
 
-  const tables = ["users, videos, views, likes, comments, shares, bookmarks"];
+  const tables = [
+    "users",
+    "videos",
+    "video_analytics",
+    "video_interactions",
+    "comments",
+  ];
 
   for (const table of tables) {
     try {

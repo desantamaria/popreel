@@ -2,13 +2,18 @@
 
 import { env } from "@/config/env";
 import { db } from "@/db";
-import { users } from "@/db/schema";
+import { CreateUserInput, users } from "@/db/schema";
 import { Logger } from "@/utils/logger";
-import { auth } from "@clerk/nextjs/dist/types/server";
+import { auth } from "@clerk/nextjs/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { eq } from "drizzle-orm";
 
 const logger = new Logger("actions:user");
+
+export async function createUser(input: CreateUserInput) {
+  const user = await db.insert(users).values(input).returning();
+  return user[0].id;
+}
 
 export async function updateUserInterests(interests: string[]) {
   logger.info("Updating user interests", { interestCount: interests.length });

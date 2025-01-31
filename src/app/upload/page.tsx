@@ -1,5 +1,3 @@
-"use client";
-
 import { FeedSidebar } from "@/components/feed-sidebar";
 import VideoUpload from "@/components/video/video-upload";
 

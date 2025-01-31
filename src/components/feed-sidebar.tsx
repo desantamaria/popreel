@@ -1,16 +1,18 @@
 import { Button } from "@/components/ui/button";
+import { SignOutButton } from "@clerk/nextjs";
+import { currentUser } from "@clerk/nextjs/server";
 import { Home, MessageCircle, Plus } from "lucide-react";
 import Link from "next/link";
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
-import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
-import { SignOutButton } from "@clerk/nextjs";
 
-export function FeedSidebar() {
+export async function FeedSidebar() {
+  const user = await currentUser();
   return (
     <div className="w-[60px] lg:w-[180px] h-screen flex flex-col justify-between border-r border-gray-800 pt-10">
       <div className="space-y-2 px-2">
@@ -70,8 +72,10 @@ export function FeedSidebar() {
         <DropdownMenu>
           <DropdownMenuTrigger asChild className="hover:cursor-pointer">
             <Avatar>
-              <AvatarImage></AvatarImage>
-              <AvatarFallback>CN</AvatarFallback>
+              <AvatarImage src={user?.imageUrl}></AvatarImage>
+              <AvatarFallback>{`${user?.firstName?.charAt(
+                0
+              )} ${user?.lastName?.charAt(0)}`}</AvatarFallback>
             </Avatar>
           </DropdownMenuTrigger>
           <DropdownMenuContent>

@@ -4,8 +4,8 @@ CREATE TABLE "comments" (
 	"video_id" uuid,
 	"content" text,
 	"total_likes" bigint,
-	"created_at" timestamp DEFAULT '2025-01-29 04:39:21.025' NOT NULL,
-	"updated_at" timestamp DEFAULT '2025-01-29 04:39:21.025' NOT NULL
+	"created_at" timestamp DEFAULT '2025-01-31 01:43:58.578' NOT NULL,
+	"updated_at" timestamp DEFAULT '2025-01-31 01:43:58.578' NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "users" (
@@ -15,12 +15,13 @@ CREATE TABLE "users" (
 	"full_name" varchar(255),
 	"bio" text,
 	"avatar_url" text,
-	"metadata" jsonb DEFAULT '{}'::jsonb,
+	"metadata" jsonb,
+	"embedding" vector(1536),
 	"is_verified" boolean DEFAULT false,
 	"is_private" boolean DEFAULT false,
-	"last_seen_at" timestamp DEFAULT '2025-01-29 04:39:21.024' NOT NULL,
-	"created_at" timestamp DEFAULT '2025-01-29 04:39:21.024' NOT NULL,
-	"updated_at" timestamp DEFAULT '2025-01-29 04:39:21.024' NOT NULL,
+	"last_seen_at" timestamp DEFAULT '2025-01-31 01:43:58.576' NOT NULL,
+	"created_at" timestamp DEFAULT '2025-01-31 01:43:58.576' NOT NULL,
+	"updated_at" timestamp DEFAULT '2025-01-31 01:43:58.576' NOT NULL,
 	CONSTRAINT "users_username_unique" UNIQUE("username"),
 	CONSTRAINT "users_email_unique" UNIQUE("email")
 );
@@ -32,8 +33,8 @@ CREATE TABLE "video_analytics" (
 	"total_likes" bigint,
 	"total_comments" bigint,
 	"total_shares" bigint,
-	"created_at" timestamp DEFAULT '2025-01-29 04:39:21.025' NOT NULL,
-	"updated_at" timestamp DEFAULT '2025-01-29 04:39:21.025' NOT NULL
+	"created_at" timestamp DEFAULT '2025-01-31 01:43:58.577' NOT NULL,
+	"updated_at" timestamp DEFAULT '2025-01-31 01:43:58.577' NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "video_interactions" (
@@ -41,27 +42,32 @@ CREATE TABLE "video_interactions" (
 	"user_id" text,
 	"video_id" uuid,
 	"interaction_type" varchar(30),
-	"metadata" jsonb DEFAULT '{}'::jsonb,
+	"metadata" jsonb,
 	"view_Duration" bigint,
 	"watch_percentage" bigint,
 	"interaction_strength" bigint,
-	"audience_demographic" jsonb DEFAULT '{}'::jsonb,
-	"hourly_views" jsonb DEFAULT '{}'::jsonb,
-	"daily_views" jsonb DEFAULT '{}'::jsonb,
-	"popularity_score" jsonb DEFAULT '{}'::jsonb,
-	"created_at" timestamp DEFAULT '2025-01-29 04:39:21.025' NOT NULL,
-	"updated_at" timestamp DEFAULT '2025-01-29 04:39:21.025' NOT NULL
+	"audience_demographic" jsonb,
+	"hourly_views" jsonb,
+	"daily_views" jsonb,
+	"popularity_score" jsonb,
+	"created_at" timestamp DEFAULT '2025-01-31 01:43:58.577' NOT NULL,
+	"updated_at" timestamp DEFAULT '2025-01-31 01:43:58.577' NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "videos" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"user_id" text,
+	"user_id" text NOT NULL,
 	"caption" text,
 	"video_url" text NOT NULL,
-	"metadata" jsonb DEFAULT '{}'::jsonb,
+	"video_size" bigint,
+	"video_length" text,
+	"transcription" text,
+	"summary" text,
+	"tags" text[],
+	"metadata" jsonb,
 	"embedding" vector(1536),
-	"created_at" timestamp DEFAULT '2025-01-29 04:39:21.025' NOT NULL,
-	"updated_at" timestamp DEFAULT '2025-01-29 04:39:21.025' NOT NULL,
+	"created_at" timestamp DEFAULT '2025-01-31 01:43:58.577' NOT NULL,
+	"updated_at" timestamp DEFAULT '2025-01-31 01:43:58.577' NOT NULL,
 	CONSTRAINT "videos_video_url_unique" UNIQUE("video_url")
 );
 --> statement-breakpoint
