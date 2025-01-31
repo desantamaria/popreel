@@ -12,9 +12,10 @@ const envSchema = z.object({
   NEXT_PUBLIC_CLERK_SIGN_IN_FALLBACK_REDIRECT_URL: z.string(),
   NEXT_PUBLIC_CLERK_SIGN_UP_FORCE_REDIRECT_URL: z.string(),
   DATABASE_URL: z.string(),
-  OPENAI_API_KEY: z.string(),
+  BLOB_READ_WRITE_TOKEN: z.string(),
   GEMINI_API_KEY: z.string(),
   GROQ_API_KEY: z.string(),
+  GOOGLE_CLOUD_PROJECT_ID: z.string(),
 });
 
 // Function to validate environment variables
@@ -32,9 +33,10 @@ const validateEnv = () => {
       NEXT_PUBLIC_CLERK_SIGN_UP_FORCE_REDIRECT_URL:
         process.env.NEXT_PUBLIC_CLERK_SIGN_UP_FORCE_REDIRECT_URL,
       DATABASE_URL: process.env.DATABASE_URL,
-      OPENAI_API_KEY: process.env.OPENAI_API_KEY,
+      BLOB_READ_WRITE_TOKEN: process.env.BLOB_READ_WRITE_TOKEN,
       GEMINI_API_KEY: process.env.GEMINI_API_KEY,
       GROQ_API_KEY: process.env.GROQ_API_KEY,
+      GOOGLE_CLOUD_PROJECT_ID: process.env.GOOGLE_CLOUD_PROJECT_ID,
     };
     const parsed = envSchema.parse(env);
     logger.info("Environment variables validated successfully");

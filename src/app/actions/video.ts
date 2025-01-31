@@ -214,7 +214,7 @@ export async function analyzeVideo(videoId: string) {
 
     // Initialize Vertex AI
     const vertexAI = new VertexAI({
-      project: process.env.GOOGLE_CLOUD_PROJECT_ID,
+      project: env.GOOGLE_CLOUD_PROJECT_ID,
       location: "use-east1",
     });
 
