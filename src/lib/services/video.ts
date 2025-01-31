@@ -163,7 +163,6 @@ export class VideoService {
     }
   }
 
-  // TODO Implement Get Video
   static async getVideo(id: string): Promise<VideoMetadata | null> {
     try {
       logger.info("Fetching video metadata", { id });
@@ -173,7 +172,7 @@ export class VideoService {
         .from(videos)
         .where(eq(videos.id, id))
         .limit(1);
-      return null;
+      return videoData[0];
     } catch (error) {
       logger.error("Failed to fetch video", { error });
       throw error;
