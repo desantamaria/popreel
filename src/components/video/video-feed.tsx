@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useRef, useEffect, use } from "react";
-import { VideoPost } from "./video-post";
+import { getVideos } from "@/app/actions/video";
 import { useVideoStore } from "@/stores/video-store";
+import { useEffect, useRef, useState } from "react";
+import { VideoPost } from "./video-post";
 
 export function VideoFeed() {
   const [currentVideoIndex, setCurrentVideoIndex] = useState(0);
@@ -13,45 +14,11 @@ export function VideoFeed() {
 
   useEffect(() => {
     const callFetchVideos = async () => {
-      //   const newVideos = await FetchVideos();
-      //   console.log(newVideos);
-      //   setVideos(newVideos);
+      const newVideos = await getVideos();
+      setVideos(newVideos);
     };
     callFetchVideos();
   }, []);
-
-  const mockVideos = [
-    {
-      id: 1,
-      url: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4",
-      caption: "Amazing video #viral #trending",
-      username: "@user1",
-      likes: "402.8K",
-      comments: "22K",
-      shares: "55.7K",
-      bookmarks: "52.3K",
-    },
-    {
-      id: 2,
-      url: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-      caption: "Check this out! #fyp #foryou",
-      username: "@user2",
-      likes: "892K",
-      comments: "45K",
-      shares: "123K",
-      bookmarks: "78.5K",
-    },
-    {
-      id: 3,
-      url: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
-      caption: "Another cool video #trending",
-      username: "@user3",
-      likes: "756K",
-      comments: "34K",
-      shares: "89K",
-      bookmarks: "67K",
-    },
-  ];
 
   const handleScroll = (e: React.WheelEvent) => {
     if (isScrolling) return;
@@ -85,32 +52,20 @@ export function VideoFeed() {
         className="transition-transform duration-500 ease-in-out"
         style={{ height: `${videos.length * 100}vh` }}
       >
-        {videos.length == -1 ? (
-          <>
-            {/* {videos.map((video, index) => (
-              <div key={video.id} className="snap-start h-screen">
-                <VideoPost
-                  url={video.videoUrl}
-                  caption={video.caption || ""}
-                  username={video.id}
-                  likes={`${video.likesCount}`}
-                  comments={`${video.commentsCount}`}
-                  shares={`${video.sharesCount}`}
-                  bookmarks={`${video.bookmarksCount}`}
-                  isActive={index === currentVideoIndex}
-                />
-              </div>
-            ))}{" "} */}
-          </>
-        ) : (
-          <>
-            {mockVideos.map((video, index) => (
-              <div key={video.id} className="snap-start h-screen">
-                <VideoPost {...video} isActive={index === currentVideoIndex} />
-              </div>
-            ))}
-          </>
-        )}
+        {videos.map((video, index) => (
+          <div key={video.id} className="snap-start h-screen">
+            <VideoPost
+              url={video.videoUrl}
+              caption={video.caption || ""}
+              username={video.id}
+              likes={`0`}
+              comments={`0`}
+              shares={`0`}
+              bookmarks={`0`}
+              isActive={index === currentVideoIndex}
+            />
+          </div>
+        ))}{" "}
       </div>
     </div>
   );

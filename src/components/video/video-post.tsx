@@ -74,7 +74,7 @@ export function VideoPost({
       <video
         ref={videoRef}
         src={url}
-        className="absolute inset-0 w-full h-full object-contain"
+        className="absolute h-full object-contain"
         loop
         muted
         playsInline

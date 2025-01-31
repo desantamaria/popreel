@@ -1,12 +1,12 @@
-import { VideoAggregation } from "@/db/schema";
+import { VideoMetadata } from "@/lib/services/video";
 import { create } from "zustand";
 
 interface Videos {
-  videos: VideoAggregation[];
-  setVideos: (videos: VideoAggregation[]) => void;
+  videos: VideoMetadata[];
+  setVideos: (videos: VideoMetadata[]) => void;
 }
 
 export const useVideoStore = create<Videos>((set) => ({
   videos: [],
-  setVideos: (videos: VideoAggregation[]) => set({ videos: videos }),
+  setVideos: (videos: VideoMetadata[]) => set({ videos: videos }),
 }));
