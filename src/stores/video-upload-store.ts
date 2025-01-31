@@ -1,7 +1,6 @@
 import { create } from "zustand";
 
 export interface VideoDetailsStore {
-  loading: boolean;
   filename: string | null;
   size: string | null;
   uploaded: boolean;
@@ -10,7 +9,6 @@ export interface VideoDetailsStore {
   categories: string[];
   videoUrl: string | null;
   file: File | null;
-  setLoading: (loading: boolean) => void;
   setFilename: (filename: string | null) => void;
   setSize: (size: string | null) => void;
   setUploaded: (uploaded: boolean) => void;
@@ -21,7 +19,6 @@ export interface VideoDetailsStore {
 }
 
 export const useVideoUploadStore = create<VideoDetailsStore>((set) => ({
-  loading: false,
   filename: null,
   size: null,
   uploaded: false,
@@ -30,7 +27,6 @@ export const useVideoUploadStore = create<VideoDetailsStore>((set) => ({
   categories: [],
   videoUrl: null,
   file: null,
-  setLoading: (loading: boolean) => set({ loading: loading }),
   setLocation: (location: string | null) => set({ location: location }),
   setCaption: (caption: string | null) => set({ caption: caption }),
   setCategories: (categories: string[]) => set({ categories: categories }),

@@ -11,13 +11,14 @@ import type { VideoUploadProps } from "@/types/video";
 import {
   RatioIcon as AspectRatio,
   FileType,
+  Loader2,
   MonitorPlay,
   Upload,
   Video,
 } from "lucide-react";
+import { useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { toast } from "sonner";
-import CategorySelect from "../category-select";
 
 export default function VideoUpload({
   maxSize = 10,
@@ -25,15 +26,12 @@ export default function VideoUpload({
   acceptedFormats = [".mp4"],
 }: VideoUploadProps) {
   const {
-    loading,
     filename,
     size,
     uploaded,
     caption,
     location,
     file,
-    categories,
-    setLoading,
     setFilename,
     setSize,
     setUploaded,
@@ -42,6 +40,8 @@ export default function VideoUpload({
     setCategories,
     setFile,
   } = useVideoUploadStore();
+
+  const [loading, setLoading] = useState(false);
 
   const onDrop = (acceptedFiles: File[]) => {
     const newFile = acceptedFiles[0];
@@ -66,11 +66,19 @@ export default function VideoUpload({
       return;
     }
     setLoading(true);
-
-    createVideo(file, caption || "");
-
+    await createVideo(file, caption || "");
+    resetForm();
     toast.success("Video Uploaded Successful!");
     setLoading(false);
+  }
+
+  function resetForm() {
+    setFilename(null);
+    setSize(null);
+    setUploaded(false);
+    setCaption(null);
+    setLocation(null);
+    setCategories([]);
   }
 
   if (filename && size && uploaded) {
@@ -85,17 +93,7 @@ export default function VideoUpload({
                 <p className="text-sm text-muted-foreground">{size}</p>
               </div>
             </div>
-            <Button
-              variant="outline"
-              onClick={() => {
-                setFilename(null);
-                setSize(null);
-                setUploaded(false);
-                setCaption(null);
-                setLocation(null);
-                setCategories([]);
-              }}
-            >
+            <Button variant="outline" onClick={resetForm}>
               Replace
             </Button>
           </div>
@@ -125,12 +123,16 @@ export default function VideoUpload({
               />
             </div>
             <div>
-              <CategorySelect />
-            </div>
-            <div>
-              <Button className="w-full" onClick={handleSubmit}>
-                Upload
-              </Button>
+              {loading ? (
+                <Button className="w-full" disabled onClick={handleSubmit}>
+                  <Loader2 className="animate-spin" />
+                  Upload
+                </Button>
+              ) : (
+                <Button className="w-full" onClick={handleSubmit}>
+                  Upload
+                </Button>
+              )}
             </div>
           </div>
         </CardContent>

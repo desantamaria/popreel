@@ -21,7 +21,7 @@ export const users = pgTable("users", {
   avatarUrl: text("avatar_url"),
   metadata: jsonb("metadata"),
   embedding: vector("embedding", {
-    dimensions: 1536,
+    dimensions: 768,
   }),
   isVerified: boolean("is_verified").default(false),
   isPrivate: boolean("is_private").default(false),
@@ -44,7 +44,7 @@ export const videos = pgTable("videos", {
   tags: text("tags").array(),
   metadata: jsonb("metadata").$type<Record<string, unknown> | null>(),
   embedding: vector("embedding", {
-    dimensions: 1536,
+    dimensions: 768,
   }),
   createdAt: timestamp("created_at").notNull().default(new Date()),
   updatedAt: timestamp("updated_at").notNull().default(new Date()),

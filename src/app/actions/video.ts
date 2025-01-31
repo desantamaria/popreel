@@ -3,6 +3,7 @@
 import { env } from "@/config/env";
 import { db } from "@/db";
 import { videos } from "@/db/schema";
+import { categoriesList } from "@/lib/categories";
 import { VideoMetadata, VideoService } from "@/lib/services/video";
 import { Logger } from "@/utils/logger";
 import { auth } from "@clerk/nextjs/server";
@@ -212,7 +213,7 @@ export async function analyzeVideo(videoId: string) {
     // Initialize Vertex AI
     const vertexAI = new VertexAI({
       project: env.GOOGLE_CLOUD_PROJECT_ID,
-      location: "use-east1",
+      location: "us-west1",
     });
 
     const generativeModel = vertexAI.getGenerativeModel({
@@ -278,13 +279,20 @@ export async function extractTags(summary: string): Promise<string[]> {
           ${summary}
           </summary>
 
+          Rules:
+          - Return 2-5 tags total
+          - Choose tags from this list: ${categoriesList}
+          - Ensure tags a concise (1-2 words)
+          - Ensure tags accurately reflect the content
+          - Return in JSON format
+
           Return format:
           {
             "tags": ["tag1", "tag2", "tag3", "tag4", "tag5"]
           }`,
       },
     ],
-    model: "llama-3-70b-8192",
+    model: "llama3-70b-8192",
     response_format: { type: "json_object" },
   });
 
