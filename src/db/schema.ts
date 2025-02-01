@@ -57,6 +57,10 @@ export const videoAnalytics = pgTable("video_analytics", {
   totalLikes: bigint("total_likes", { mode: "number" }),
   totalComments: bigint("total_comments", { mode: "number" }),
   totalShares: bigint("total_shares", { mode: "number" }),
+  audienceDemographic: jsonb("audience_demographic"),
+  hourlyViews: jsonb("hourly_views"),
+  dailyViews: jsonb("daily_views"),
+  popularityScore: jsonb("popularity_score"),
   createdAt: timestamp("created_at").notNull().default(new Date()),
   updatedAt: timestamp("updated_at").notNull().default(new Date()),
 });
@@ -70,10 +74,6 @@ export const videoInteractions = pgTable("video_interactions", {
   viewDuration: bigint("view_Duration", { mode: "number" }),
   watchPercentage: bigint("watch_percentage", { mode: "number" }),
   interactionStrength: bigint("interaction_strength", { mode: "number" }),
-  audienceDemographic: jsonb("audience_demographic"),
-  hourlyViews: jsonb("hourly_views"),
-  dailyViews: jsonb("daily_views"),
-  popularityScore: jsonb("popularity_score"),
   createdAt: timestamp("created_at").notNull().default(new Date()),
   updatedAt: timestamp("updated_at").notNull().default(new Date()),
 });
@@ -89,9 +89,10 @@ export const comments = pgTable("comments", {
 });
 
 // Types
-export type UserAggregation = InferSelectModel<typeof users>;
-export type VideoAggregation = InferSelectModel<typeof videos>;
-export type CommentAggregation = InferSelectModel<typeof comments>;
+export type UserSelect = InferSelectModel<typeof users>;
+export type VideoSelect = InferSelectModel<typeof videos>;
+export type CommentSelect = InferSelectModel<typeof comments>;
+export type VideoInteractionSelect = InferSelectModel<typeof videoInteractions>;
 
 export type CreateUserInput = InferInsertModel<typeof users>;
 export type CreateVideoInput = InferInsertModel<typeof videos>;

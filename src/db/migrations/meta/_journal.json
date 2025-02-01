@@ -22,6 +22,13 @@
       "when": 1738363850969,
       "tag": "0002_wandering_gideon",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1738392445521,
+      "tag": "0003_thankful_jigsaw",
+      "breakpoints": true
     }
   ]
 }
