@@ -18,6 +18,8 @@ export interface VideoMetadata {
   tags: string[] | undefined | null;
   metadata: Record<string, unknown> | null;
   embedding: number[] | null;
+  userName?: string | null | undefined;
+  userAvatar?: string | null | undefined;
 }
 
 export class VideoService {

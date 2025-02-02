@@ -55,9 +55,11 @@ export function VideoFeed() {
         {videos.map((video, index) => (
           <div key={video.id} className="snap-start h-screen">
             <VideoPost
+              id={video.id}
               url={video.videoUrl}
               caption={video.caption || ""}
-              username={video.id}
+              username={video.userName || "user"}
+              userAvatar={video.userAvatar || ""}
               likes={`0`}
               comments={`0`}
               shares={`0`}

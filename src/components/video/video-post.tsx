@@ -4,11 +4,18 @@ import { useEffect, useRef } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { BookmarkIcon, Heart, MessageCircle, Share2 } from "lucide-react";
+import {
+  shareVideo,
+  toggleBookmark,
+  toggleLike,
+} from "@/app/actions/interactions";
 
 interface VideoPostProps {
+  id: string;
   url: string;
   caption: string;
   username: string;
+  userAvatar: string;
   likes: string;
   comments: string;
   shares: string;
@@ -17,9 +24,11 @@ interface VideoPostProps {
 }
 
 export function VideoPost({
+  id,
   url,
   caption,
   username,
+  userAvatar,
   likes,
   comments,
   shares,
@@ -92,6 +101,9 @@ export function VideoPost({
             size="icon"
             variant="ghost"
             className="rounded-full bg-black/20 backdrop-blur-sm text-white"
+            onClick={() => {
+              toggleLike(id);
+            }}
           >
             <Heart className="h-7 w-7" />
           </Button>
@@ -112,6 +124,9 @@ export function VideoPost({
             size="icon"
             variant="ghost"
             className="rounded-full bg-black/20 backdrop-blur-sm text-white"
+            onClick={() => {
+              toggleBookmark(id);
+            }}
           >
             <BookmarkIcon className="h-7 w-7" />
           </Button>
@@ -122,14 +137,17 @@ export function VideoPost({
             size="icon"
             variant="ghost"
             className="rounded-full bg-black/20 backdrop-blur-sm text-white"
+            onClick={() => {
+              shareVideo(id);
+            }}
           >
             <Share2 className="h-7 w-7" />
           </Button>
           <span className="text-sm text-white">{shares}</span>
         </div>
         <Avatar className="h-12 w-12 border-2 border-white">
-          <AvatarImage src="/placeholder.svg" />
-          <AvatarFallback>UN</AvatarFallback>
+          <AvatarImage src={userAvatar} />
+          <AvatarFallback>{username.charAt(1)}</AvatarFallback>
         </Avatar>
       </div>
     </div>

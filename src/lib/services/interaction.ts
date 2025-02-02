@@ -1,16 +1,11 @@
 import { and, eq, sql } from "drizzle-orm";
 import { db } from "@/db";
-import {
-  comments,
-  videoAnalytics,
-  videoInteractions,
-  VideoInteractionSelect,
-} from "@/db/schema";
+import { comments, videoAnalytics, videoInteractions } from "@/db/schema";
 
 interface InteractionResponse {
   success: boolean;
   message: string;
-  data?: VideoInteractionSelect[];
+  data?: any;
 }
 
 export class VideoInteractionService {
@@ -20,56 +15,38 @@ export class VideoInteractionService {
     videoId: string
   ): Promise<InteractionResponse> {
     try {
-      const [existingView] = await db
-        .select()
-        .from(videoInteractions)
-        .where(
-          and(
-            eq(videoInteractions.userId, userId),
-            eq(videoInteractions.videoId, videoId),
-            eq(videoInteractions.interactionType, "view")
-          )
-        );
-
-      if (existingView) {
-        return { success: true, message: "View already recorded" };
-      }
-
-      // Record the view interaction
       await db.insert(videoInteractions).values({
         userId,
         videoId,
         interactionType: "view",
-        viewDuration: 0, // TODO Implement Watch Time
-        watchPercentage: 0, // TODO Implement Watch Time
+        viewDuration: 0,
+        watchPercentage: 0,
         interactionStrength: 1,
       });
 
-      // Update analytics
-      await db.transaction(async (tx) => {
-        const [analytics] = await tx
-          .select()
-          .from(videoAnalytics)
-          .where(eq(videoAnalytics.videoId, videoId));
+      // Get existing analytics
+      const [analytics] = await db
+        .select()
+        .from(videoAnalytics)
+        .where(eq(videoAnalytics.videoId, videoId));
 
-        if (analytics) {
-          await tx
-            .update(videoAnalytics)
-            .set({
-              totalViews: Number(analytics.totalViews) + 1,
-              updatedAt: new Date(),
-            })
-            .where(eq(videoAnalytics.videoId, videoId));
-        } else {
-          await tx.insert(videoAnalytics).values({
-            videoId,
-            totalViews: 1,
-            totalLikes: 0,
-            totalComments: 0,
-            totalShares: 0,
-          });
-        }
-      });
+      if (analytics) {
+        await db
+          .update(videoAnalytics)
+          .set({
+            totalViews: Number(analytics.totalViews) + 1,
+            updatedAt: new Date(),
+          })
+          .where(eq(videoAnalytics.videoId, videoId));
+      } else {
+        await db.insert(videoAnalytics).values({
+          videoId,
+          totalViews: 1,
+          totalLikes: 0,
+          totalComments: 0,
+          totalShares: 0,
+        });
+      }
 
       return { success: true, message: "View recorded successfully" };
     } catch (error) {
@@ -95,45 +72,40 @@ export class VideoInteractionService {
           )
         );
 
-      await db.transaction(async (tx) => {
-        if (existingLike) {
-          // Unlike
-          await tx
-            .delete(videoInteractions)
-            .where(eq(videoInteractions.id, existingLike.id));
+      if (existingLike) {
+        // Unlike
+        await db
+          .delete(videoInteractions)
+          .where(eq(videoInteractions.id, existingLike.id));
 
-          await tx
-            .update(videoAnalytics)
-            .set({
-              totalLikes: sql`${videoAnalytics.totalLikes} - 1`,
-              updatedAt: new Date(),
-            })
-            .where(eq(videoAnalytics.videoId, videoId));
+        await db
+          .update(videoAnalytics)
+          .set({
+            totalLikes: sql`${videoAnalytics.totalLikes} - 1`,
+            updatedAt: new Date(),
+          })
+          .where(eq(videoAnalytics.videoId, videoId));
 
-          return { success: true, message: "Video unliked successfully" };
-        } else {
-          // Like
-          await tx.insert(videoInteractions).values({
-            userId,
-            videoId,
-            interactionType: "like",
-            interactionStrength: 1,
-          });
+        return { success: true, message: "Video unliked successfully" };
+      }
 
-          await tx
-            .update(videoAnalytics)
-            .set({
-              totalLikes: sql`${videoAnalytics.totalLikes} + 1`,
-              updatedAt: new Date(),
-            })
-            .where(eq(videoAnalytics.videoId, videoId));
-        }
+      // Like
+      await db.insert(videoInteractions).values({
+        userId,
+        videoId,
+        interactionType: "like",
+        interactionStrength: 1,
       });
 
-      return {
-        success: true,
-        message: existingLike ? "Video unliked" : "Video liked",
-      };
+      await db
+        .update(videoAnalytics)
+        .set({
+          totalLikes: sql`${videoAnalytics.totalLikes} + 1`,
+          updatedAt: new Date(),
+        })
+        .where(eq(videoAnalytics.videoId, videoId));
+
+      return { success: true, message: "Video liked successfully" };
     } catch (error) {
       console.error("Error toggling like:", error);
       return { success: false, message: "Failed to toggle like" };
@@ -146,24 +118,22 @@ export class VideoInteractionService {
     videoId: string
   ): Promise<InteractionResponse> {
     try {
-      await db.transaction(async (tx) => {
-        // Record share interaction
-        await tx.insert(videoInteractions).values({
-          userId,
-          videoId,
-          interactionType: "share",
-          interactionStrength: 2, // Share shows more interest in video than like
-        });
-
-        // Update analytics
-        await tx
-          .update(videoAnalytics)
-          .set({
-            totalShares: sql`${videoAnalytics.totalShares} + 1`,
-            updatedAt: new Date(),
-          })
-          .where(eq(videoAnalytics.videoId, videoId));
+      // Record share interaction
+      await db.insert(videoInteractions).values({
+        userId,
+        videoId,
+        interactionType: "share",
+        interactionStrength: 2,
       });
+
+      // Update analytics
+      await db
+        .update(videoAnalytics)
+        .set({
+          totalShares: sql`${videoAnalytics.totalShares} + 1`,
+          updatedAt: new Date(),
+        })
+        .where(eq(videoAnalytics.videoId, videoId));
 
       return { success: true, message: "Share recorded successfully" };
     } catch (error) {
@@ -200,7 +170,7 @@ export class VideoInteractionService {
         userId,
         videoId,
         interactionType: "bookmark",
-        interactionStrength: 3, // Shows much interest in video topics
+        interactionStrength: 1,
       });
 
       return { success: true, message: "Video bookmarked successfully" };
@@ -217,32 +187,30 @@ export class VideoInteractionService {
     content: string
   ): Promise<InteractionResponse> {
     try {
-      await db.transaction(async (tx) => {
-        // Add comment
-        await tx.insert(comments).values({
-          userId,
-          videoId,
-          content,
-          totalLikes: 0,
-        });
-
-        // Record comment interaction
-        await tx.insert(videoInteractions).values({
-          userId,
-          videoId,
-          interactionType: "comment",
-          interactionStrength: 3, // Comments show more interest than likes
-        });
-
-        // Update analytics
-        await tx
-          .update(videoAnalytics)
-          .set({
-            totalComments: sql`${videoAnalytics.totalComments} + 1`,
-            updatedAt: new Date(),
-          })
-          .where(eq(videoAnalytics.videoId, videoId));
+      // Add comment
+      await db.insert(comments).values({
+        userId,
+        videoId,
+        content,
+        totalLikes: 0,
       });
+
+      // Record comment interaction
+      await db.insert(videoInteractions).values({
+        userId,
+        videoId,
+        interactionType: "comment",
+        interactionStrength: 3,
+      });
+
+      // Update analytics
+      await db
+        .update(videoAnalytics)
+        .set({
+          totalComments: sql`${videoAnalytics.totalComments} + 1`,
+          updatedAt: new Date(),
+        })
+        .where(eq(videoAnalytics.videoId, videoId));
 
       return { success: true, message: "Comment added successfully" };
     } catch (error) {
