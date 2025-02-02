@@ -1,19 +1,13 @@
 import { and, eq, sql } from "drizzle-orm";
 import { db } from "@/db";
 import { comments, videoAnalytics, videoInteractions } from "@/db/schema";
+import { Logger } from "@/utils/logger";
 
-interface InteractionResponse {
-  success: boolean;
-  message: string;
-  data?: any;
-}
+const logger = new Logger("VideoInteractionService");
 
 export class VideoInteractionService {
   // View video
-  static async recordView(
-    userId: string,
-    videoId: string
-  ): Promise<InteractionResponse> {
+  static async recordView(userId: string, videoId: string) {
     try {
       await db.insert(videoInteractions).values({
         userId,
@@ -50,16 +44,13 @@ export class VideoInteractionService {
 
       return { success: true, message: "View recorded successfully" };
     } catch (error) {
-      console.error("Error recording view:", error);
+      logger.error("Error recording view:", error);
       return { success: false, message: "Failed to record view" };
     }
   }
 
   // Like/Unlike video
-  static async toggleLike(
-    userId: string,
-    videoId: string
-  ): Promise<InteractionResponse> {
+  static async toggleLike(userId: string, videoId: string): Promise<boolean> {
     try {
       const [existingLike] = await db
         .select()
@@ -86,7 +77,7 @@ export class VideoInteractionService {
           })
           .where(eq(videoAnalytics.videoId, videoId));
 
-        return { success: true, message: "Video unliked successfully" };
+        return true;
       }
 
       // Like
@@ -105,18 +96,21 @@ export class VideoInteractionService {
         })
         .where(eq(videoAnalytics.videoId, videoId));
 
-      return { success: true, message: "Video liked successfully" };
+      const analyticsResults = await db
+        .select({ likeCount: videoAnalytics.totalLikes })
+        .from(videoAnalytics)
+        .where(eq(videoAnalytics.videoId, videoId))
+        .limit(1);
+
+      return false;
     } catch (error) {
-      console.error("Error toggling like:", error);
-      return { success: false, message: "Failed to toggle like" };
+      logger.error("Error toggling like:", error);
+      throw new Error("Failed to toggle like");
     }
   }
 
   // Share video
-  static async recordShare(
-    userId: string,
-    videoId: string
-  ): Promise<InteractionResponse> {
+  static async recordShare(userId: string, videoId: string) {
     try {
       // Record share interaction
       await db.insert(videoInteractions).values({
@@ -137,7 +131,7 @@ export class VideoInteractionService {
 
       return { success: true, message: "Share recorded successfully" };
     } catch (error) {
-      console.error("Error recording share:", error);
+      logger.error("Error recording share:", error);
       return { success: false, message: "Failed to record share" };
     }
   }
@@ -146,7 +140,7 @@ export class VideoInteractionService {
   static async toggleBookmark(
     userId: string,
     videoId: string
-  ): Promise<InteractionResponse> {
+  ): Promise<boolean> {
     try {
       const [existingBookmark] = await db
         .select()
@@ -163,7 +157,7 @@ export class VideoInteractionService {
         await db
           .delete(videoInteractions)
           .where(eq(videoInteractions.id, existingBookmark.id));
-        return { success: true, message: "Bookmark removed successfully" };
+        return true;
       }
 
       await db.insert(videoInteractions).values({
@@ -173,19 +167,15 @@ export class VideoInteractionService {
         interactionStrength: 1,
       });
 
-      return { success: true, message: "Video bookmarked successfully" };
+      return false;
     } catch (error) {
-      console.error("Error toggling bookmark:", error);
-      return { success: false, message: "Failed to toggle bookmark" };
+      logger.error("Error toggling bookmark:", error);
+      throw new Error("Failed to toggle bookmark");
     }
   }
 
   // Add comment
-  static async addComment(
-    userId: string,
-    videoId: string,
-    content: string
-  ): Promise<InteractionResponse> {
+  static async addComment(userId: string, videoId: string, content: string) {
     try {
       // Add comment
       await db.insert(comments).values({
@@ -214,7 +204,7 @@ export class VideoInteractionService {
 
       return { success: true, message: "Comment added successfully" };
     } catch (error) {
-      console.error("Error adding comment:", error);
+      logger.error("Error adding comment:", error);
       return { success: false, message: "Failed to add comment" };
     }
   }
@@ -225,7 +215,7 @@ export class VideoInteractionService {
     videoId: string,
     duration: number,
     percentage: number
-  ): Promise<InteractionResponse> {
+  ) {
     try {
       const [existingView] = await db
         .select()
@@ -253,16 +243,13 @@ export class VideoInteractionService {
 
       return { success: true, message: "View duration updated successfully" };
     } catch (error) {
-      console.error("Error updating view duration:", error);
+      logger.error("Error updating view duration:", error);
       return { success: false, message: "Failed to update view duration" };
     }
   }
 
   // Get user's interaction history with a video
-  static async getUserVideoInteractions(
-    userId: string,
-    videoId: string
-  ): Promise<InteractionResponse> {
+  static async getUserVideoInteractions(userId: string, videoId: string) {
     try {
       const interactions = await db
         .select()
@@ -280,7 +267,7 @@ export class VideoInteractionService {
         data: interactions,
       };
     } catch (error) {
-      console.error("Error retrieving interactions:", error);
+      logger.error("Error retrieving interactions:", error);
       return { success: false, message: "Failed to retrieve interactions" };
     }
   }

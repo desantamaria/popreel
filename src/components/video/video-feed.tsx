@@ -4,6 +4,7 @@ import { getVideos } from "@/app/actions/video";
 import { useVideoStore } from "@/stores/video-store";
 import { useEffect, useRef, useState } from "react";
 import { VideoPost } from "./video-post";
+import { handleView } from "@/app/actions/interactions";
 
 export function VideoFeed() {
   const [currentVideoIndex, setCurrentVideoIndex] = useState(0);
@@ -16,21 +17,25 @@ export function VideoFeed() {
     const callFetchVideos = async () => {
       const newVideos = await getVideos();
       setVideos(newVideos);
+      if (newVideos.length > 0) {
+        handleView(newVideos[currentVideoIndex].id);
+      }
     };
     callFetchVideos();
   }, []);
 
-  const handleScroll = (e: React.WheelEvent) => {
+  const handleScroll = async (e: React.WheelEvent) => {
     if (isScrolling) return;
 
     if (e.deltaY > 0 && currentVideoIndex < videos.length - 1) {
       setIsScrolling(true);
       setCurrentVideoIndex((prev) => prev + 1);
-      setTimeout(() => setIsScrolling(false), 500); // Match this with CSS transition duration
+      handleView(videos[currentVideoIndex + 1].id);
+      setTimeout(() => setIsScrolling(false), 500);
     } else if (e.deltaY < 0 && currentVideoIndex > 0) {
       setIsScrolling(true);
       setCurrentVideoIndex((prev) => prev - 1);
-      setTimeout(() => setIsScrolling(false), 500); // Match this with CSS transition duration
+      setTimeout(() => setIsScrolling(false), 500);
     }
   };
 
@@ -60,10 +65,10 @@ export function VideoFeed() {
               caption={video.caption || ""}
               username={video.userName || "user"}
               userAvatar={video.userAvatar || ""}
-              likes={`0`}
-              comments={`0`}
-              shares={`0`}
-              bookmarks={`0`}
+              likes={0}
+              comments={0}
+              shares={0}
+              bookmarks={0}
               isActive={index === currentVideoIndex}
             />
           </div>

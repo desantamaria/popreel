@@ -56,6 +56,7 @@ export const videoAnalytics = pgTable("video_analytics", {
   totalViews: bigint("total_views", { mode: "number" }),
   totalLikes: bigint("total_likes", { mode: "number" }),
   totalComments: bigint("total_comments", { mode: "number" }),
+  totalBookmarks: bigint("total_bookmarks", { mode: "number" }),
   totalShares: bigint("total_shares", { mode: "number" }),
   audienceDemographic: jsonb("audience_demographic"),
   hourlyViews: jsonb("hourly_views"),

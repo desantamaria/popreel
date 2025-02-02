@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { BookmarkIcon, Heart, MessageCircle, Share2 } from "lucide-react";
@@ -16,10 +16,10 @@ interface VideoPostProps {
   caption: string;
   username: string;
   userAvatar: string;
-  likes: string;
-  comments: string;
-  shares: string;
-  bookmarks: string;
+  likes: number;
+  comments: number;
+  shares: number;
+  bookmarks: number;
   isActive: boolean;
 }
 
@@ -36,6 +36,14 @@ export function VideoPost({
   isActive,
 }: VideoPostProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
+
+  const [likesCount, setLikesCount] = useState(likes);
+  const [likeToggle, setLikeToggle] = useState(false);
+
+  const [bookmarksCount, setBookmarksCount] = useState(bookmarks);
+  const [bookmarkToggle, setBookmarkToggle] = useState(false);
+
+  const [sharesCount, setSharesCount] = useState(shares);
 
   useEffect(() => {
     if (videoRef.current) {
@@ -101,13 +109,15 @@ export function VideoPost({
             size="icon"
             variant="ghost"
             className="rounded-full bg-black/20 backdrop-blur-sm text-white"
-            onClick={() => {
-              toggleLike(id);
+            onClick={async () => {
+              const isDislike = await toggleLike(id);
+              setLikeToggle(!isDislike);
+              setLikesCount(isDislike ? likesCount - 1 : likesCount + 1);
             }}
           >
-            <Heart className="h-7 w-7" />
+            <Heart className="h-7 w-7" fill={likeToggle ? "red" : ""} />
           </Button>
-          <span className="text-sm text-white">{likes}</span>
+          <span className="text-sm text-white">{likesCount}</span>
         </div>
         <div className="flex flex-col items-center gap-1">
           <Button
@@ -124,13 +134,20 @@ export function VideoPost({
             size="icon"
             variant="ghost"
             className="rounded-full bg-black/20 backdrop-blur-sm text-white"
-            onClick={() => {
-              toggleBookmark(id);
+            onClick={async () => {
+              const isUnBookmark = await toggleBookmark(id);
+              setBookmarkToggle(!isUnBookmark);
+              setBookmarksCount(
+                isUnBookmark ? bookmarksCount - 1 : bookmarksCount + 1
+              );
             }}
           >
-            <BookmarkIcon className="h-7 w-7" />
+            <BookmarkIcon
+              className="h-7 w-7"
+              fill={bookmarkToggle ? "gold" : ""}
+            />
           </Button>
-          <span className="text-sm text-white">{bookmarks}</span>
+          <span className="text-sm text-white">{bookmarksCount}</span>
         </div>
         <div className="flex flex-col items-center gap-1">
           <Button
@@ -139,11 +156,12 @@ export function VideoPost({
             className="rounded-full bg-black/20 backdrop-blur-sm text-white"
             onClick={() => {
               shareVideo(id);
+              setSharesCount((prev) => prev + 1);
             }}
           >
             <Share2 className="h-7 w-7" />
           </Button>
-          <span className="text-sm text-white">{shares}</span>
+          <span className="text-sm text-white">{sharesCount}</span>
         </div>
         <Avatar className="h-12 w-12 border-2 border-white">
           <AvatarImage src={userAvatar} />

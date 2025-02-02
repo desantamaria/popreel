@@ -6,7 +6,7 @@ import { VideoInteractionService } from "@/lib/services/interaction";
 
 const logger = new Logger("actions:video-interactions");
 
-export async function toggleLike(videoId: string) {
+export async function handleView(videoId: string) {
   const { userId } = await auth();
 
   if (!userId) {
@@ -14,9 +14,24 @@ export async function toggleLike(videoId: string) {
   }
 
   try {
-    await VideoInteractionService.toggleLike(userId, videoId);
+    await VideoInteractionService.recordView(userId, videoId);
   } catch (error) {
     logger.error("Failed to like/unlike video");
+  }
+}
+
+export async function toggleLike(videoId: string) {
+  const { userId } = await auth();
+
+  if (!userId) {
+    throw new Error("No Logged In User");
+  }
+
+  try {
+    return await VideoInteractionService.toggleLike(userId, videoId);
+  } catch (error) {
+    logger.error("Failed to like/unlike video");
+    throw new Error("An error occurred", { cause: error });
   }
 }
 
@@ -28,7 +43,7 @@ export async function toggleBookmark(videoId: string) {
   }
 
   try {
-    await VideoInteractionService.toggleBookmark(userId, videoId);
+    return await VideoInteractionService.toggleBookmark(userId, videoId);
   } catch (error) {
     logger.error("Failed to bookmark video");
   }
