@@ -5,10 +5,12 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { BookmarkIcon, Heart, MessageCircle, Share2 } from "lucide-react";
 import {
+  getVideoInteractions,
   shareVideo,
   toggleBookmark,
   toggleLike,
 } from "@/app/actions/interactions";
+import { VideoAnalyticsSelect } from "@/db/schema";
 
 interface VideoPostProps {
   id: string;
@@ -16,10 +18,6 @@ interface VideoPostProps {
   caption: string;
   username: string;
   userAvatar: string;
-  likes: number;
-  comments: number;
-  shares: number;
-  bookmarks: number;
   isActive: boolean;
 }
 
@@ -29,21 +27,25 @@ export function VideoPost({
   caption,
   username,
   userAvatar,
-  likes,
-  comments,
-  shares,
-  bookmarks,
   isActive,
 }: VideoPostProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
 
-  const [likesCount, setLikesCount] = useState(likes);
+  const [likesCount, setLikesCount] = useState(0);
   const [likeToggle, setLikeToggle] = useState(false);
-
-  const [bookmarksCount, setBookmarksCount] = useState(bookmarks);
+  const [bookmarksCount, setBookmarksCount] = useState(0);
   const [bookmarkToggle, setBookmarkToggle] = useState(false);
+  const [sharesCount, setSharesCount] = useState(0);
 
-  const [sharesCount, setSharesCount] = useState(shares);
+  useEffect(() => {
+    async function fetchAnalytics() {
+      const results = await getVideoInteractions(id);
+      setLikesCount(results?.totalLikes || 0);
+      setBookmarksCount(results?.totalBookmarks || 0);
+      setSharesCount(results?.totalShares || 0);
+    }
+    fetchAnalytics();
+  }, []);
 
   useEffect(() => {
     if (videoRef.current) {
@@ -127,7 +129,7 @@ export function VideoPost({
           >
             <MessageCircle className="h-7 w-7" />
           </Button>
-          <span className="text-sm text-white">{comments}</span>
+          <span className="text-sm text-white">{0}</span>
         </div>
         <div className="flex flex-col items-center gap-1">
           <Button

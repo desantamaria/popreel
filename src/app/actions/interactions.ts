@@ -1,10 +1,27 @@
 "use server";
 
-import { auth } from "@clerk/nextjs/server";
-import { Logger } from "@/utils/logger";
+import { db } from "@/db";
+import { videoAnalytics } from "@/db/schema";
 import { VideoInteractionService } from "@/lib/services/interaction";
+import { Logger } from "@/utils/logger";
+import { auth } from "@clerk/nextjs/server";
+import { eq } from "drizzle-orm";
 
 const logger = new Logger("actions:video-interactions");
+
+export async function getVideoInteractions(videoId: string) {
+  try {
+    const analytics = await db
+      .select()
+      .from(videoAnalytics)
+      .where(eq(videoAnalytics.videoId, videoId))
+      .limit(1);
+
+    return analytics[0];
+  } catch (error) {
+    logger.error("Failed to fetch video analytics");
+  }
+}
 
 export async function handleView(videoId: string) {
   const { userId } = await auth();

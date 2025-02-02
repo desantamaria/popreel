@@ -94,6 +94,7 @@ export type UserSelect = InferSelectModel<typeof users>;
 export type VideoSelect = InferSelectModel<typeof videos>;
 export type CommentSelect = InferSelectModel<typeof comments>;
 export type VideoInteractionSelect = InferSelectModel<typeof videoInteractions>;
+export type VideoAnalyticsSelect = InferInsertModel<typeof videoAnalytics>;
 
 export type CreateUserInput = InferInsertModel<typeof users>;
 export type CreateVideoInput = InferInsertModel<typeof videos>;

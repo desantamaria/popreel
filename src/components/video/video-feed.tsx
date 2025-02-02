@@ -65,10 +65,6 @@ export function VideoFeed() {
               caption={video.caption || ""}
               username={video.userName || "user"}
               userAvatar={video.userAvatar || ""}
-              likes={0}
-              comments={0}
-              shares={0}
-              bookmarks={0}
               isActive={index === currentVideoIndex}
             />
           </div>
