@@ -117,9 +117,7 @@ export class VideoService {
       // Get unique user IDs from videos
       const userIds = Array.from(
         new Set(
-          videosData
-            .map((video) => video.userId)
-            .filter((id): id is string => id !== null)
+          videosData.map((video) => video.userId).filter((id) => id !== null)
         )
       );
 
@@ -177,128 +175,6 @@ export class VideoService {
       return videoData[0];
     } catch (error) {
       logger.error("Failed to fetch video", { error });
-      throw error;
-    }
-  }
-
-  static async getRecommendedVideos(userId: string): Promise<VideoMetadata[]> {
-    try {
-      logger.info("getting recommended videos for user", { userId });
-
-      const userData = await db
-        .select({ embedding: users.embedding })
-        .from(users)
-        .where(eq(users.id, userId))
-        .limit(1);
-
-      if (!userData) {
-        throw new Error("Failed to fetch user embeddings");
-      }
-
-      // If user has no embedding yet, return recent videos
-      if (!userData[0].embedding) {
-        logger.info("User has no embedding, returning recent videos");
-        return this.listAllVideos();
-      }
-
-      const userEmbedding = userData[0].embedding;
-
-      logger.info("User embedding retrieved", {
-        length: userEmbedding.length,
-        sample: userEmbedding.slice(0, 5),
-      });
-
-      // Get videos with embeddings, excluding user's own videos
-      const videosData = await db
-        .select()
-        .from(videos)
-        .where(and(isNotNull(videos.embedding)))
-        .orderBy(desc(videos.createdAt));
-
-      if (!videosData || videosData.length === 0) {
-        logger.info("No videos found with embeddings");
-        return this.listAllVideos();
-      }
-
-      // Get unique user IDs from videos
-      const userIds = Array.from(
-        new Set(videosData.map((video) => video.userId))
-      );
-
-      // Fetch user info for all users in one query
-      const usersData = await db
-        .select({
-          id: users.id,
-          username: users.username,
-          avatarUrl: users.avatarUrl,
-        })
-        .from(users)
-        .where(inArray(users.id, userIds));
-
-      const userMap = new Map(usersData.map((user) => [user.id, user]));
-
-      // Calculate cosine similarity and sort videos
-      const scoredVideos = videosData
-        .filter((video) => video.embedding)
-        .map((video) => {
-          // Parse embeddings if they're stored as string
-          const videoEmbeddings =
-            typeof video.embedding === "string"
-              ? JSON.parse(video.embedding)
-              : video.embedding;
-          const similarity =
-            videoEmbeddings.reduce(
-              (sum: number, val: number, i: number) =>
-                sum + val * userEmbedding[i],
-              0
-            ) /
-            (Math.sqrt(
-              videoEmbeddings.reduce(
-                videoEmbeddings.reduce(
-                  (sum: number, val: number) => sum + val * val
-                )
-              )
-            ) *
-              Math.sqrt(
-                userEmbedding.reduce(
-                  (sum: number, val: number) => sum + val * val,
-                  0
-                )
-              ));
-          return {
-            ...video,
-            score: similarity,
-          };
-        })
-        .sort((a, b) => b.score - a.score);
-
-      logger.info("Videos ranked by similarity", {
-        totalVideos: scoredVideos.length,
-        topScore: scoredVideos[0]?.score,
-        bottomScore: scoredVideos[scoredVideos.length - 1]?.score,
-      });
-
-      return scoredVideos.map((video) => {
-        const user = userMap.get(video.userId);
-        return {
-          id: video.id,
-          videoUrl: video.videoUrl,
-          caption: video.caption,
-          userId: video.userId,
-          createdAt: video.createdAt,
-          transcription: video.transcription || undefined,
-          tags: video.tags || undefined,
-          videoLength: video.videoLength || undefined,
-          videoSize: video.videoSize || undefined,
-          summary: video.summary || undefined,
-          metadata: video.metadata || null,
-          embedding: video.embedding || null,
-          userName: user?.username,
-          userAvatar: user?.avatarUrl,
-        };
-      });
-    } catch (error) {
-      logger.error("Failed to fetch recommended videos", error);
       throw error;
     }
   }

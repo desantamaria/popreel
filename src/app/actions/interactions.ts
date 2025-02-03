@@ -6,6 +6,7 @@ import { VideoInteractionService } from "@/lib/services/interaction";
 import { Logger } from "@/utils/logger";
 import { auth } from "@clerk/nextjs/server";
 import { eq } from "drizzle-orm";
+import { revalidatePath } from "next/cache";
 
 const logger = new Logger("actions:video-interactions");
 
@@ -45,7 +46,9 @@ export async function toggleLike(videoId: string) {
   }
 
   try {
-    return await VideoInteractionService.toggleLike(userId, videoId);
+    const result = await VideoInteractionService.toggleLike(userId, videoId);
+    revalidatePath("/feed");
+    return result;
   } catch (error) {
     logger.error("Failed to like/unlike video");
     throw new Error("An error occurred", { cause: error });

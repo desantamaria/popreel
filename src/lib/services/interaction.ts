@@ -85,7 +85,7 @@ export class VideoInteractionService {
         userId,
         videoId,
         interactionType: "like",
-        interactionStrength: 1,
+        interactionStrength: 3,
       });
 
       await db
@@ -117,7 +117,7 @@ export class VideoInteractionService {
         userId,
         videoId,
         interactionType: "share",
-        interactionStrength: 2,
+        interactionStrength: 4,
       });
 
       // Update analytics
@@ -164,7 +164,7 @@ export class VideoInteractionService {
         userId,
         videoId,
         interactionType: "bookmark",
-        interactionStrength: 1,
+        interactionStrength: 2,
       });
 
       return false;
@@ -190,7 +190,7 @@ export class VideoInteractionService {
         userId,
         videoId,
         interactionType: "comment",
-        interactionStrength: 3,
+        interactionStrength: 5,
       });
 
       // Update analytics

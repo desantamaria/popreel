@@ -1,16 +1,15 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
-import { BookmarkIcon, Heart, MessageCircle, Share2 } from "lucide-react";
 import {
   getVideoInteractions,
   shareVideo,
   toggleBookmark,
   toggleLike,
 } from "@/app/actions/interactions";
-import { VideoAnalyticsSelect } from "@/db/schema";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { BookmarkIcon, Eye, Heart, MessageCircle, Share2 } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 
 interface VideoPostProps {
   id: string;
@@ -37,12 +36,15 @@ export function VideoPost({
   const [bookmarkToggle, setBookmarkToggle] = useState(false);
   const [sharesCount, setSharesCount] = useState(0);
 
+  const [views, setViews] = useState(0);
+
   useEffect(() => {
     async function fetchAnalytics() {
       const results = await getVideoInteractions(id);
       setLikesCount(results?.totalLikes || 0);
       setBookmarksCount(results?.totalBookmarks || 0);
       setSharesCount(results?.totalShares || 0);
+      setViews(results?.totalViews || 0);
     }
     fetchAnalytics();
   }, []);
@@ -106,6 +108,10 @@ export function VideoPost({
         </div>
       </div>
       <div className="absolute right-2 bottom-20 flex flex-col items-center gap-4">
+        <div className="flex flex-col items-center gap-1">
+          <Eye className="h-7 w-7" />
+          <span className="text-sm text-white">{views}</span>
+        </div>
         <div className="flex flex-col items-center gap-1">
           <Button
             size="icon"
