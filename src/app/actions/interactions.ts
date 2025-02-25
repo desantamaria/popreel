@@ -34,7 +34,7 @@ export async function handleView(videoId: string) {
   try {
     await VideoInteractionService.recordView(userId, videoId);
   } catch (error) {
-    logger.error("Failed to like/unlike video");
+    logger.error("Failed to view video");
   }
 }
 

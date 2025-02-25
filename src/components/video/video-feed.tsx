@@ -4,7 +4,7 @@ import { getVideos } from "@/app/actions/video";
 import { useVideoStore } from "@/stores/video-store";
 import { useEffect, useRef, useState } from "react";
 import { VideoPost } from "./video-post";
-import { handleView } from "@/app/actions/interactions";
+// import { handleView } from "@/app/actions/interactions";
 
 export function VideoFeed() {
   const [currentVideoIndex, setCurrentVideoIndex] = useState(0);
@@ -17,26 +17,50 @@ export function VideoFeed() {
     const callFetchVideos = async () => {
       const newVideos = await getVideos();
       setVideos(newVideos);
+      console.log(newVideos);
       if (newVideos.length > 0) {
-        handleView(newVideos[currentVideoIndex].id);
+        // handleView(newVideos[currentVideoIndex].id);
       }
     };
     callFetchVideos();
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
   }, []);
 
-  const handleScroll = async (e: React.WheelEvent) => {
+  const handleKeyDown = (e: KeyboardEvent) => {
+    if (e.key === "ArrowUp") {
+      handleScroll(e);
+    } else if (e.key === "ArrowDown") {
+      handleScroll(e);
+    }
+  };
+
+  const handleScroll = async (e: React.WheelEvent | KeyboardEvent) => {
     if (isScrolling) return;
 
-    if (e.deltaY > 0 && currentVideoIndex < videos.length - 1) {
+    if (
+      (e instanceof WheelEvent &&
+        e.deltaY > 0 &&
+        currentVideoIndex < videos.length - 1) ||
+      (e instanceof KeyboardEvent && e.key == "ArrowDown")
+    ) {
       setIsScrolling(true);
       setCurrentVideoIndex((prev) => prev + 1);
-      handleView(videos[currentVideoIndex + 1].id);
+      //   handleView(videos[currentVideoIndex + 1].id);
       setTimeout(() => setIsScrolling(false), 500);
-    } else if (e.deltaY < 0 && currentVideoIndex > 0) {
+    } else if (
+      (e instanceof WheelEvent && e.deltaY < 0 && currentVideoIndex > 0) ||
+      (e instanceof KeyboardEvent && e.key == "ArrowUp")
+    ) {
       setIsScrolling(true);
       setCurrentVideoIndex((prev) => prev - 1);
+      //   handleView(videos[currentVideoIndex - 1].id);
       setTimeout(() => setIsScrolling(false), 500);
     }
+
+    console.log(currentVideoIndex);
   };
 
   useEffect(() => {

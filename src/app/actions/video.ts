@@ -16,15 +16,15 @@ import Groq from "groq-sdk";
 import { revalidatePath } from "next/cache";
 import { tmpdir } from "os";
 import { join } from "path";
-import { getPersonalizedFeed } from "./recommendation";
+// import { getPersonalizedFeed } from "./recommendation";
 
 const logger = new Logger("actions:video");
 
 export async function getVideos(): Promise<VideoMetadata[]> {
   const { userId } = await auth();
-  if (userId) {
-    return getPersonalizedFeed(20);
-  }
+  //   if (userId) {
+  //     return getPersonalizedFeed(20);
+  //   }
   return VideoService.listAllVideos();
 }
 
